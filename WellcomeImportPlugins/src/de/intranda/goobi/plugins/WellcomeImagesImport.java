@@ -193,9 +193,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier + ".xml";
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
 		}
-		return this.currentIdentifier + ".xml";
+		return this.currentIdentifier ;
 	}
 
 	@Override
@@ -286,8 +286,8 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	public static void main(String[] args) throws PreferencesException, WriteException {
 		WellcomeImagesImport wci = new WellcomeImagesImport();
-//		wci.setFile(new File("/home/robert/workspace/SotonImportPlugins/src/L0052000.xml"));
-//		List<Record> bla = wci.generateRecordsFromFile();
+		wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/src/L0052000.xml"));
+		List<Record> bla = wci.generateRecordsFromFile();
 		
 
 		

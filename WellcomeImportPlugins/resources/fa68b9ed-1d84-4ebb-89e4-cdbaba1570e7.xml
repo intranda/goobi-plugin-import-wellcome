@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DScribeRecord>
-	<RecordType>Component</RecordType>
+	<!-- <RecordType>Component</RecordType>-->
+	<RecordType>Monograph</RecordType>
 	<IDENTITY />
 	<RefNo>PPCRI/A/2/3</RefNo>
 	<AltRefNo>PP/CRI/A/2/3</AltRefNo>
@@ -31,11 +32,13 @@
 	<ACCESS />
 	<AccessStatus>Open</AccessStatus>
 	<AccessConditions>The papers are available subject to the usual conditions of access to Archives and Manuscripts material, after the completion of a
-		Reader's Undertaking.</AccessConditions>
+		Reader's Undertaking.
+	</AccessConditions>
 	<ClosedUntil />
 	<UserDate1 />
 	<UserWrapped1>Images are supplied for private research only at the Archivist's discretion. Please note that material may be unsuitable for copying on
-		conservation grounds. Researchers who wish to publish material must seek copyright permission from the copyright owner.</UserWrapped1>
+		conservation grounds. Researchers who wish to publish material must seek copyright permission from the copyright owner.
+	</UserWrapped1>
 	<Language />
 	<UserWrapped6 />
 	<Material>Archives - Non-digital</Material>
@@ -55,7 +58,8 @@
 	<PublnNote />
 	<Notes />
 	<UserWrapped3>Compiled in compliance with General International Standard Archival Description, ISAD(G), second edition, 2000, and AACR2. Sent to
-		Millennium in MARC21.</UserWrapped3>
+		Millennium in MARC21.
+	</UserWrapped3>
 	<UserText2>August 2003</UserText2>
 	<CatalogueStatus>Catalogued</CatalogueStatus>
 	<RCN>R19070</RCN>
