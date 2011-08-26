@@ -165,20 +165,20 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				}
 
 				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"),
-						getProcessTitle().replace(".xml", "_mods.xml"), docMods);
+						getProcessTitle().replace(".xml", "_mrc.xml"), doc);
 			}
 		} catch (JDOMException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		} catch (PreferencesException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		} catch (TypeNotAllowedForParentException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		} catch (MetadataTypeNotAllowedException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		} catch (TypeNotAllowedAsChildException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
 		}
 
 		return ff;
