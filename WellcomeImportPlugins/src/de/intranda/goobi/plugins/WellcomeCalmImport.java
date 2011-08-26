@@ -46,7 +46,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeCalmImport.class);
 
 	private static final String NAME = "Calm Import";
-	private static final String VERSION = "0.0";
+	private static final String VERSION = "1.0";
 	private static final String MAPPING_FILE = ConfigMain.getParameter("KonfigurationVerzeichnis") + "WellcomeCalm_map.properties";
 	private String data = "";
 	private String importFolder = "";
@@ -108,6 +108,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				// generating DocStruct
 
 				String dsType = dScribeRecord.getChild("RecordType").getText(); 
+				
+				// TODO sicherstellen das alle dsType im Regelsatz existieren
+				if (!dsType.equals("Monograph")) {
+					System.out.println(dsType);
+					dsType = "Monograph";
+				}
 				DocStruct dsRoot = dd.createDocStruct(this.prefs.getDocStrctTypeByName(dsType));
 				dd.setLogicalDocStruct(dsRoot);
 
@@ -287,29 +293,52 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	}
 
 	public static void main(String[] args) throws PreferencesException, WriteException {
+//		WellcomeCalmImport wci = new WellcomeCalmImport();
+//		wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/resources/fa68b9ed-1d84-4ebb-89e4-cdbaba1570e7.xml"));
+//		List<Record> bla = wci.generateRecordsFromFile();
+//		
+//
+//		
+//		Prefs prefs = new Prefs();
+//		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
+//		wci.setPrefs(prefs);
+//		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
+//		List<Record> recordList = wci.generateRecordsFromFile();
+//		// Record r = recordList.get(0);
+//		for (Record r : recordList) {
+//			wci.data = r.getData();
+//			Fileformat ff = wci.convertData();
+//			if (ff != null) {
+//				MetsMods mm = new MetsMods(prefs);
+//				mm.setDigitalDocument(ff.getDigitalDocument());
+//				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
+//				logger.debug("Writing '" + fileName + "' into hotfolder...");
+//				mm.write(fileName);
+//			}
+//		}
+		
+		File[] calms = new File("/home/robert/Downloads/wellcome/CALM/").listFiles();
 		WellcomeCalmImport wci = new WellcomeCalmImport();
-		wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/resources/fa68b9ed-1d84-4ebb-89e4-cdbaba1570e7.xml"));
-		List<Record> bla = wci.generateRecordsFromFile();
-		
-
-		
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
 		wci.setPrefs(prefs);
 		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
-		List<Record> recordList = wci.generateRecordsFromFile();
-		// Record r = recordList.get(0);
-		for (Record r : recordList) {
-			wci.data = r.getData();
-			Fileformat ff = wci.convertData();
-			if (ff != null) {
-				MetsMods mm = new MetsMods(prefs);
-				mm.setDigitalDocument(ff.getDigitalDocument());
-				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-				logger.debug("Writing '" + fileName + "' into hotfolder...");
-				mm.write(fileName);
-			}
+		List<Record> recordList = new ArrayList<Record>();
+		for (File filename : calms) {
+			wci.setFile(filename);
+			recordList.addAll(wci.generateRecordsFromFile());
 		}
+		for (Record r : recordList) {
+		wci.data = r.getData();
+		Fileformat ff = wci.convertData();
+		if (ff != null) {
+			MetsMods mm = new MetsMods(prefs);
+			mm.setDigitalDocument(ff.getDigitalDocument());
+			String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
+			logger.debug("Writing '" + fileName + "' into hotfolder...");
+			mm.write(fileName);
+		}
+	}
 		
 	}
 }

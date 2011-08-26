@@ -14,7 +14,12 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 
 import ugh.dl.DocStruct;
 import ugh.dl.Metadata;
@@ -28,6 +33,7 @@ public class WellcomeUtils {
 	
 	private static final Logger logger = Logger.getLogger(WellcomeUtils.class);
 	private static PropertiesConfiguration config = null;
+	private static final Namespace NS_MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
 
 	private static PropertiesConfiguration loadConfiguration(String configFile) {
 		PropertiesConfiguration.setDefaultListDelimiter('&');
@@ -158,7 +164,129 @@ public class WellcomeUtils {
 	
 	
 	
-	
+
+	/**
+	 * 
+	 * @param pres
+	 * @param dsLogical
+	 * @param dsPhysical
+	 * @param eleMods
+	 * @param mappingFile
+	 * @throws IOException
+	 * @throws JDOMException
+	 */
+	@SuppressWarnings("unchecked")
+	public static void parseModsSection(String mappingFileName, Prefs prefs, DocStruct dsLogical, DocStruct dsPhysical, Element eleMods)
+			throws JDOMException, IOException {
+		// logger.debug(new XMLOutputter().outputString(eleMods));
+		Document doc = new Document();
+		Element eleNewMods = (Element) eleMods.clone();
+		doc.setRootElement(eleNewMods);
+		File file = new File(mappingFileName);
+		Document mapDoc = new SAXBuilder().build(file);
+		for (Object obj : mapDoc.getRootElement().getChildren("metadata", null)) {
+			Element eleMetadata = (Element) obj;
+			String mdName = eleMetadata.getChildTextTrim("name", null);
+			MetadataType mdType = prefs.getMetadataTypeByName(mdName);
+			if (mdType != null) {
+				try {
+					List<Element> eleXpathList = eleMetadata.getChildren("xpath", null);
+					if (mdType.getIsPerson()) {
+						// Persons
+						for (Element eleXpath : eleXpathList) {
+							String query = eleXpath.getTextTrim();
+							// logger.debug("XPath: " + query);
+							XPath xpath = XPath.newInstance(query);
+							xpath.addNamespace(NS_MODS);
+							// Element eleValue = (Element) xpath.selectSingleNode(doc);
+							List<Element> eleValueList = xpath.selectNodes(doc);
+							if (eleValueList != null) {
+								for (Element eleValue : eleValueList) {
+									String name = "";
+									String firstName = "";
+									String lastName = "";
+
+									if (eleXpath.getAttribute("family") != null) {
+										lastName = eleValue.getTextTrim();
+									} else if (eleXpath.getAttribute("given") != null) {
+										firstName = eleValue.getTextTrim();
+									} else {
+										name = eleValue.getTextTrim();
+									}
+
+									if (name.contains(",")) {
+										String[] nameSplit = name.split("[,]");
+										if (nameSplit.length > 0 && StringUtils.isEmpty(lastName)) {
+											lastName = nameSplit[0].trim();
+										}
+										if (nameSplit.length > 1 && StringUtils.isEmpty(firstName)) {
+											firstName = nameSplit[1].trim();
+										}
+									} else {
+										lastName = name;
+									}
+
+									if (StringUtils.isNotEmpty(lastName)) {
+										Person person = new Person(mdType);
+										person.setFirstname(firstName);
+										person.setLastname(lastName);
+										person.setRole(mdType.getName());
+										if (eleMetadata.getAttribute("logical") != null
+												&& eleMetadata.getAttributeValue("logical").equalsIgnoreCase("true")) {
+											dsLogical.addPerson(person);
+										}
+									}
+								}
+							}
+						}
+
+					} else {
+						// Regular metadata
+						for (Element eleXpath : eleXpathList) {
+							String query = eleXpath.getTextTrim();
+							// logger.debug("XPath: " + query);
+							XPath xpath = XPath.newInstance(query);
+							xpath.addNamespace(NS_MODS);
+							List<Element> eleValueList = xpath.selectNodes(doc);
+							if (eleValueList != null) {
+								for (Element eleValue : eleValueList) {
+									List<String> values = new ArrayList<String>();
+									// logger.debug("value: " + eleValue.getTextTrim());
+									values.add(eleValue.getTextTrim());
+
+									String value = "";
+									for (String s : values) {
+										if (StringUtils.isNotEmpty(s)) {
+											value += " " + s;
+										}
+									}
+									value = value.trim();
+
+									if (value.length() > 0) {
+										Metadata metadata = new Metadata(mdType);
+										metadata.setValue(value);
+										if (eleMetadata.getAttribute("logical") != null
+												&& eleMetadata.getAttributeValue("logical").equalsIgnoreCase("true")) {
+											dsLogical.addMetadata(metadata);
+										}
+										if (eleMetadata.getAttribute("physical") != null
+												&& eleMetadata.getAttributeValue("physical").equalsIgnoreCase("true")) {
+											dsPhysical.addMetadata(metadata);
+										}
+									}
+								}
+							}
+						}
+
+					}
+				} catch (MetadataTypeNotAllowedException e) {
+					logger.warn(e.getMessage());
+				}
+			} else {
+				logger.warn("Metadata '" + mdName + "' is not defined in the ruleset.");
+			}
+		}
+	}
 	
 	public static void main(String[] args) {
 		String wellcomeImageMapping = "/opt/digiverso/goobi/config/WellcomeImages_map.properties";
