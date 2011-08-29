@@ -51,8 +51,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	/** Logger for this class. */
 	private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
 
-	private static final String NAME = "Cambridge MARC21 Import";
-	private static final String VERSION = "1.0.20110616";
+	private static final String NAME = "Millenium Import";
+	private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
 
