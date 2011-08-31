@@ -46,7 +46,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeImagesImport.class);
 
 	private static final String NAME = "Wellcome Images Import";
-	private static final String VERSION = "0.0";
+	// private static final String VERSION = "0.0";
 	private static final String MAPPING_FILE = ConfigMain.getParameter("KonfigurationVerzeichnis") + "WellcomeImages_map.properties";
 
 	private String data = "";
@@ -64,7 +64,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getId() {
-		return getDescription();
+		return NAME;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getDescription() {
-		return NAME + " v" + VERSION;
+		return NAME;
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				Metadata path = new Metadata(this.prefs.getMetadataTypeByName("pathimagefiles"));
 				path.setValue("./");
 				dsBoundBook.addMetadata(path);
-				
+
 				// reading import file
 				List<String> elementList = WellcomeUtils.getKeys(MAPPING_FILE);
 				for (String key : elementList) {
@@ -145,7 +145,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 					}
 
 					if (toTest != null) {
-						if (toTest.getChild("_")!= null) {
+						if (toTest.getChild("_") != null) {
 							toTest = toTest.getChild("_");
 						}
 						String metadataName = WellcomeUtils.getValue(MAPPING_FILE, key);
@@ -168,8 +168,8 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 			}
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"), getProcessTitle()
-					.replace(".xml", "_WellcomeImages.xml"), doc);
+			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"),
+					getProcessTitle().replace(".xml", "_WellcomeImages.xml"), doc);
 		} catch (JDOMException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
@@ -193,9 +193,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
 		}
-		return this.currentIdentifier ;
+		return this.currentIdentifier;
 	}
 
 	@Override
@@ -220,7 +220,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle();
+					String fileName = getImportFolder() + getProcessTitle() + ".xml";
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
@@ -285,18 +285,17 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	}
 
 	public static void main(String[] args) throws PreferencesException, WriteException {
+		File[] calms = new File("/home/robert/Downloads/wellcome/millenium/").listFiles();
 		WellcomeImagesImport wci = new WellcomeImagesImport();
-		wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/src/L0052000.xml"));
-		List<Record> bla = wci.generateRecordsFromFile();
-		
-
-		
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
 		wci.setPrefs(prefs);
 		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
-		List<Record> recordList = wci.generateRecordsFromFile();
-		// Record r = recordList.get(0);
+		List<Record> recordList = new ArrayList<Record>();
+		for (File filename : calms) {
+			wci.setFile(filename);
+			recordList.addAll(wci.generateRecordsFromFile());
+		}
 		for (Record r : recordList) {
 			wci.data = r.getData();
 			Fileformat ff = wci.convertData();
@@ -308,7 +307,6 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				mm.write(fileName);
 			}
 		}
-		
 	}
 
 }

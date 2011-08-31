@@ -46,7 +46,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeCalmImport.class);
 
 	private static final String NAME = "Calm Import";
-	private static final String VERSION = "1.0";
+//	private static final String VERSION = "1.0";
 	private static final String MAPPING_FILE = ConfigMain.getParameter("KonfigurationVerzeichnis") + "WellcomeCalm_map.properties";
 	private String data = "";
 	private String importFolder = "";
@@ -63,7 +63,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getId() {
-		return getDescription();
+		return NAME;
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getDescription() {
-		return NAME + " v" + VERSION;
+		return NAME;
 	}
 
 	@Override
@@ -228,7 +228,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle();
+					String fileName = getImportFolder() + getProcessTitle() + ".xml";
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);

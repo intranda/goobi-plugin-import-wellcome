@@ -52,7 +52,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
 
 	private static final String NAME = "Millenium Import";
-	private static final String VERSION = "0.1";
+//	private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
 
@@ -83,6 +83,27 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		this.map.put("?mixed material", null);
 	}
 
+	@Override
+	public String getId() {
+		return NAME;
+	}
+
+	@Override
+	public PluginType getType() {
+		return PluginType.Import;
+	}
+
+	@Override
+	public String getTitle() {
+		return NAME;
+	}
+
+	@Override
+	public String getDescription() {
+		return NAME;
+	}
+	
+	
 	@Override
 	public Fileformat convertData() {
 		Fileformat ff = null;
@@ -197,7 +218,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle();
+					String fileName = getImportFolder() + getProcessTitle()+ ".xml";
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
@@ -293,7 +314,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier + ".xml";
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
 		}
 		return this.currentIdentifier + ".xml";
 	}
@@ -334,25 +355,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		return answer;
 	}
 
-	@Override
-	public PluginType getType() {
-		return PluginType.Import;
-	}
-
-	@Override
-	public String getTitle() {
-		return getDescription();
-	}
-
-	@Override
-	public String getId() {
-		return getDescription();
-	}
-
-	@Override
-	public String getDescription() {
-		return NAME + " v" + VERSION;
-	}
 
 	/**
 	 * 
