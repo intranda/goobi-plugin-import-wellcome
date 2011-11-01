@@ -112,15 +112,16 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		try {
 			doc = new SAXBuilder().build(new StringReader(this.data));
 			if (doc != null && doc.hasRootElement()) {
-				Element record = doc.getRootElement().getChild("record", MARC);
-				List<Element> controlfields = record.getChildren("controlfield", MARC);
-				List<Element> datafields = record.getChildren("datafield", MARC);
+				
+				Element record = doc.getRootElement().getChild("record");
+				List<Element> controlfields = record.getChildren("controlfield");
+				List<Element> datafields = record.getChildren("datafield");
 
 				for (Element e : controlfields) {
 					if (e.getAttributeValue("tag").equals("001")) {
 						for (Element e907 : datafields) {
 							if (e907.getAttributeValue("tag").equals("907")) {
-								List<Element> subfields = e907.getChildren("subfield", MARC);
+								List<Element> subfields = e907.getChildren("subfield");
 								for (Element subfield : subfields) {
 									if (subfield.getAttributeValue("code").equals("a")) {
 										e.setText(subfield.getText());
