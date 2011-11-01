@@ -24,6 +24,7 @@ import org.goobi.production.plugin.interfaces.IPlugin;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformer;
@@ -52,9 +53,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
 
 	private static final String NAME = "Millenium Import";
-//	private static final String VERSION = "0.1";
+	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
+	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
 	private Prefs prefs;
 	private String data = "";
@@ -102,8 +104,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	public String getDescription() {
 		return NAME;
 	}
-	
-	
+
 	@Override
 	public Fileformat convertData() {
 		Fileformat ff = null;
@@ -111,9 +112,28 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		try {
 			doc = new SAXBuilder().build(new StringReader(this.data));
 			if (doc != null && doc.hasRootElement()) {
+				Element record = doc.getRootElement().getChild("record", MARC);
+				List<Element> controlfields = record.getChildren("controlfield", MARC);
+				List<Element> datafields = record.getChildren("datafield", MARC);
+
+				for (Element e : controlfields) {
+					if (e.getAttributeValue("tag").equals("001")) {
+						for (Element e907 : datafields) {
+							if (e907.getAttributeValue("tag").equals("907")) {
+								List<Element> subfields = e907.getChildren("subfield", MARC);
+								for (Element subfield : subfields) {
+									if (subfield.getAttributeValue("code").equals("a")) {
+										e.setText(subfield.getText());
+									}
+								}
+							}
+						}
+					}
+				}
+
 				XSLTransformer transformer = new XSLTransformer(XSLT);
 				Document docMods = transformer.transform(doc);
-//				 logger.debug(new XMLOutputter().outputString(docMods));
+				// logger.debug(new XMLOutputter().outputString(docMods));
 
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
@@ -185,21 +205,21 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					}
 				}
 
-				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"),
-						getProcessTitle().replace(".xml", "_mrc.xml"), doc);
+				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"), getProcessTitle()
+						.replace(".xml", "_mrc.xml"), doc);
 			}
 		} catch (JDOMException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		} catch (IOException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		} catch (PreferencesException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		} catch (TypeNotAllowedForParentException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		} catch (MetadataTypeNotAllowedException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		} catch (TypeNotAllowedAsChildException e) {
-			logger.error(this.currentIdentifier + ": "  + e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 		}
 
 		return ff;
@@ -218,7 +238,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle()+ ".xml";
+					String fileName = getImportFolder() + getProcessTitle() + ".xml";
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
@@ -314,7 +334,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
 		}
 		return this.currentIdentifier + ".xml";
 	}
@@ -354,7 +374,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 		return answer;
 	}
-
 
 	/**
 	 * 
@@ -478,11 +497,11 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
 		List<Record> recordList = new ArrayList<Record>();
 		for (File filename : calms) {
-//		File filename = calms[0];
+			// File filename = calms[0];
 			wci.setFile(filename);
 			recordList.addAll(wci.generateRecordsFromFile());
 		}
-//		Record r = recordList.get(0);
+		// Record r = recordList.get(0);
 		for (Record r : recordList) {
 			wci.data = r.getData();
 			Fileformat ff = wci.convertData();

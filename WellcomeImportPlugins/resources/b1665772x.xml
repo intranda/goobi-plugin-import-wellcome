@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<marc:collection xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+	<marc:record>
+		<marc:leader>02123 km a2200385 a 4500</marc:leader>
+		<marc:controlfield tag="001">ocm00665772i</marc:controlfield>
+		<marc:controlfield tag="007">kj co</marc:controlfield>
+		<marc:controlfield tag="008">080529s199u    gw                kuger d</marc:controlfield>
+		<marc:datafield tag="028" ind1=" " ind2=" ">
+			<marc:subfield code="a">51428</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="040" ind1=" " ind2=" ">
+			<marc:subfield code="d">UtOrBLW</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="043" ind1=" " ind2=" ">
+			<marc:subfield code="a">e-gx---</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="089" ind1=" " ind2=" ">
+			<marc:subfield code="a">L 53257</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="110" ind1="2" ind2=" ">
+			<marc:subfield code="a">Bundeszentrale für Gesundheitliche Aufklärung (Germany)</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="245" ind1="1" ind2="2">
+			<marc:subfield code="a">A black condom; representing protection for women against AIDS. Colour lithograph, 199-.</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="260" ind1=" " ind2=" ">
+			<marc:subfield code="a">Köln (51101 Köln) :</marc:subfield>
+			<marc:subfield code="b">Bundeszentrale für Gesundheitliche Aufklärung,</marc:subfield>
+			<marc:subfield code="c">[199-?]</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="300" ind1=" " ind2=" ">
+			<marc:subfield code="a">1 print :</marc:subfield>
+			<marc:subfield code="b">lithograph, printed in colours ;</marc:subfield>
+			<marc:subfield code="c">sheet 59.5 x 42 cm.</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="514" ind1=" " ind2=" ">
+			<marc:subfield code="a">Translation of lettering: &quot;Tonight the little black (one). Join in&quot;. In German 'das kleine Schwarze' is normally assumed to refer to a 'little black dress' but here it is applied to a 'little black' condom (condom has the same gender--neuter--as the word for dress)</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="514" ind1=" " ind2=" ">
+			<marc:subfield code="a">Bears logo of campaigns: 'Gib AIDS keine Chance' (Don t give AIDS a chance) and 'Mach's mit' (Join in)</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="514" ind1=" " ind2=" ">
+			<marc:subfield code="a">Bears order number: Bestell-Nr. 70805000</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="521" ind1="4" ind2=" ">
+			<marc:subfield code="a">Women</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="524" ind1=" " ind2=" ">
+			<marc:subfield code="a">Wellcome Library no. 665772i</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="542" ind1=" " ind2=" ">
+			<marc:subfield code="c">Bundeszentrale für Gesundheitliche Aufklärung (Germany)</marc:subfield>
+			<marc:subfield code="d">undetermined</marc:subfield>
+			<marc:subfield code="i">199-</marc:subfield>
+			<marc:subfield code="k">Bundeszentrale für Gesundheitliche Aufklärung</marc:subfield>
+			<marc:subfield code="p">Germany</marc:subfield>
+			<marc:subfield code="o">29/05/2008</marc:subfield>
+			<marc:subfield code="q">UkLW</marc:subfield>
+			<marc:subfield code="r">UK</marc:subfield>
+			<marc:subfield code="s">Transcription from the item</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="650" ind1=" " ind2="0">
+			<marc:subfield code="a">AIDS (Disease)</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="650" ind1=" " ind2="0">
+			<marc:subfield code="a">Condoms.</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="651" ind1=" " ind2="0">
+			<marc:subfield code="a">Germany.</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="655" ind1=" " ind2="7">
+			<marc:subfield code="a">Posters.</marc:subfield>
+			<marc:subfield code="2">gmgpc</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="655" ind1=" " ind2="7">
+			<marc:subfield code="a">Lithographs.</marc:subfield>
+			<marc:subfield code="2">gmgpc</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="749" ind1=" " ind2="0">
+			<marc:subfield code="a">Heut  Abend das kleine Schwarze. Mach s mit. Telefonberatung: 02 21-89 20 31. Bundeszentrale für gesundheitliche Aufklärung, 51101 Köln. Internet: www.bzga.de</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="759" ind1=" " ind2=" ">
+			<marc:subfield code="a">digaids</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="907" ind1=" " ind2=" ">
+			<marc:subfield code="a">.b1665772x</marc:subfield>
+			<marc:subfield code="b">22-04-10</marc:subfield>
+			<marc:subfield code="c">29-05-08</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="998" ind1=" " ind2=" ">
+			<marc:subfield code="a">stax</marc:subfield>
+			<marc:subfield code="a">digi</marc:subfield>
+			<marc:subfield code="b">29-05-08</marc:subfield>
+			<marc:subfield code="c">m</marc:subfield>
+			<marc:subfield code="d">k</marc:subfield>
+			<marc:subfield code="e">-</marc:subfield>
+			<marc:subfield code="f">ger</marc:subfield>
+			<marc:subfield code="g">gw </marc:subfield>
+			<marc:subfield code="h">2</marc:subfield>
+			<marc:subfield code="i">0</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="907" ind1=" " ind2=" ">
+			<marc:subfield code="a">.b1665772x</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="962" ind1=" " ind2=" ">
+			<marc:subfield code="a">000:000:URL:b0000000:000000:0:0:0:0:0:0</marc:subfield>
+			<marc:subfield code="v">n</marc:subfield>
+			<marc:subfield code="u">http://images.wellcome.ac.uk/ixbin/hixclient.exe?MIROPAC=L0053257</marc:subfield>
+			<marc:subfield code="e">http://images.wellcome.ac.uk/ixbin/imageserv?MIRO=L0053257</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="998" ind1=" " ind2=" ">
+			<marc:subfield code="a">stax</marc:subfield>
+			<marc:subfield code="b">29-05-08</marc:subfield>
+			<marc:subfield code="c">m</marc:subfield>
+			<marc:subfield code="d">k</marc:subfield>
+			<marc:subfield code="e">a</marc:subfield>
+			<marc:subfield code="f">ger</marc:subfield>
+			<marc:subfield code="g">gw </marc:subfield>
+			<marc:subfield code="h">2</marc:subfield>
+			<marc:subfield code="i">0</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="945" ind1=" " ind2=" ">
+			<marc:subfield code="a">665772i</marc:subfield>
+			<marc:subfield code="g">1</marc:subfield>
+			<marc:subfield code="j">0</marc:subfield>
+			<marc:subfield code="l">sicon</marc:subfield>
+			<marc:subfield code="o">f</marc:subfield>
+			<marc:subfield code="p">0.00</marc:subfield>
+			<marc:subfield code="q">-</marc:subfield>
+			<marc:subfield code="r">f</marc:subfield>
+			<marc:subfield code="s">-</marc:subfield>
+			<marc:subfield code="t">11</marc:subfield>
+			<marc:subfield code="u">0</marc:subfield>
+			<marc:subfield code="v">0</marc:subfield>
+			<marc:subfield code="w">0</marc:subfield>
+			<marc:subfield code="x">0</marc:subfield>
+			<marc:subfield code="y">.i16012161</marc:subfield>
+			<marc:subfield code="z">29-05-08</marc:subfield>
+		</marc:datafield>
+	</marc:record>
+</marc:collection>
