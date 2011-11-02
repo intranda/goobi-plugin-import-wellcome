@@ -206,8 +206,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					}
 				}
 
-				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"), getProcessTitle()
-						.replace(".xml", "_mrc.xml"), doc);
+				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle()	+ "_mrc.xml", doc);
 			}
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
@@ -337,7 +336,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
 			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
 		}
-		return this.currentIdentifier + ".xml";
+		return this.currentIdentifier;
 	}
 
 	@Override
