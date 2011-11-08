@@ -124,7 +124,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 								List<Element> subfields = e907.getChildren("subfield");
 								for (Element subfield : subfields) {
 									if (subfield.getAttributeValue("code").equals("a")) {
-										e.setText(subfield.getText());
+										e.setText(subfield.getText().replace(".", ""));
 									}
 								}
 							}
@@ -206,7 +206,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					}
 				}
 
-				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle()	+ "_mrc.xml", doc);
+				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml", "_src"), getProcessTitle().replace(".xml", "_mrc.xml"), doc);
 			}
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
@@ -238,7 +238,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle() + ".xml";
+					String fileName = getImportFolder() + getProcessTitle();
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
@@ -334,9 +334,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier + ".xml";
 		}
-		return this.currentIdentifier;
+		return this.currentIdentifier + ".xml";
 	}
 
 	@Override

@@ -202,9 +202,9 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier + ".xml";
 		}
-		return this.currentIdentifier ;
+		return this.currentIdentifier + ".xml";
 	}
 
 	@Override
@@ -229,7 +229,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle() + ".xml";
+					String fileName = getImportFolder() + getProcessTitle();
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
