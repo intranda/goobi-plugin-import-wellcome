@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.goobi.production.Import.ImportObject;
 import org.goobi.production.Import.Record;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
@@ -209,13 +209,15 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	}
 
 	@Override
-	public HashMap<String, ImportReturnValue> generateFiles(List<Record> records) {
-		HashMap<String, ImportReturnValue> ret = new HashMap<String, ImportReturnValue>();
+	public List<ImportObject> generateFiles(List<Record> records) {
+		List<ImportObject> answer = new ArrayList<ImportObject>();
 
 		for (Record r : records) {
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
 			Fileformat ff = convertData();
+			ImportObject io = new ImportObject(r);
+			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
 				r.setId(this.currentIdentifier);
 				try {
@@ -224,20 +226,25 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 					String fileName = getImportFolder() + getProcessTitle();
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
-					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
+					io.setMetsFilename(fileName);
+					io.setImportReturnValue(ImportReturnValue.ExportFinished);
+//					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
 				} catch (PreferencesException e) {
 					logger.error(e.getMessage(), e);
-					ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+					io.setImportReturnValue(ImportReturnValue.InvalidData);
+//					ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 				} catch (WriteException e) {
 					logger.error(e.getMessage(), e);
-					ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+					io.setImportReturnValue(ImportReturnValue.WriteError);
+//					ret.put(getProcessTitle(), ImportReturnValue.WriteError);
 				}
 			} else {
-				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+				io.setImportReturnValue(ImportReturnValue.InvalidData);
+//				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 			}
 		}
 
-		return ret;
+		return answer;
 
 	}
 
