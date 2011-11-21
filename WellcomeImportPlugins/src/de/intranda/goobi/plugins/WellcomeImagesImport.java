@@ -168,9 +168,8 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 			}
-			
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle().replace(".xml","_src"), getProcessTitle().replace(".xml", "_WellcomeImages.xml"), doc);
-
+			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle()+ "_src",
+					getProcessTitle()+ "_WellcomeImages", doc);
 		} catch (JDOMException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
@@ -194,9 +193,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier + ".xml";
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
 		}
-		return this.currentIdentifier + ".xml";
+		return this.currentIdentifier ;
 	}
 
 	@Override
@@ -223,7 +222,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				try {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle();
+					String fileName = getImportFolder() + getProcessTitle() + ".xml";
 					logger.debug("Writing '" + fileName + "' into hotfolder...");
 					mm.write(fileName);
 					io.setMetsFilename(fileName);
@@ -242,6 +241,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				io.setImportReturnValue(ImportReturnValue.InvalidData);
 //				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 			}
+			answer.add(io);
 		}
 
 		return answer;
