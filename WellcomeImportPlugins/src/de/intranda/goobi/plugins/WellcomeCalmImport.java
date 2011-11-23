@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -17,6 +18,8 @@ import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
+import org.goobi.production.properties.ImportProperty;
+import org.goobi.production.properties.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -36,8 +39,12 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.Beans.Prozesseigenschaft;
+import de.sub.goobi.Beans.Vorlageeigenschaft;
+import de.sub.goobi.Beans.Werkstueckeigenschaft;
 import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
+import de.sub.goobi.helper.enums.PropertyType;
 
 @PluginImplementation
 public class WellcomeCalmImport implements IImportPlugin, IPlugin {
@@ -46,7 +53,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private static final Logger logger = Logger.getLogger(WellcomeCalmImport.class);
 
 	private static final String NAME = "Calm Import";
-//	private static final String VERSION = "1.0";
+	// private static final String VERSION = "1.0";
 	private static final String MAPPING_FILE = ConfigMain.getParameter("KonfigurationVerzeichnis") + "WellcomeCalm_map.properties";
 	private String data = "";
 	private String importFolder = "";
@@ -60,6 +67,36 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private String currentIdentifier;
 
 	private List<String> currentCollectionList;
+
+	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
+
+	public WellcomeCalmImport() {
+		super();
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("Prozesseigenschaft");
+			ip.setType(Type.TEXT);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("Vorlageeigenschaft");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("Value1");
+			values.add("Value2");
+			values.add("Value3");
+			ip.setPossibleValues(values);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("Werkstueckeigenschaft");
+			ip.setType(Type.TEXT);
+			this.properties.add(ip);
+		}
+
+	}
 
 	@Override
 	public String getId() {
@@ -107,8 +144,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 				// generating DocStruct
 
-				String dsType = dScribeRecord.getChild("RecordType").getText(); 
-				
+				String dsType = dScribeRecord.getChild("RecordType").getText();
+
 				// TODO sicherstellen das alle dsType im Regelsatz existieren
 				if (!dsType.equals("Monograph")) {
 					dsType = "Monograph";
@@ -123,7 +160,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				Metadata path = new Metadata(this.prefs.getMetadataTypeByName("pathimagefiles"));
 				path.setValue("./");
 				dsBoundBook.addMetadata(path);
-				
+
 				// reading import file
 				List<String> elementList = WellcomeUtils.getKeys(MAPPING_FILE);
 				for (String key : elementList) {
@@ -149,7 +186,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 					}
 
 					if (toTest != null) {
-						if (toTest.getChild("_")!= null) {
+						if (toTest.getChild("_") != null) {
 							toTest = toTest.getChild("_");
 						}
 						String metadataName = WellcomeUtils.getValue(MAPPING_FILE, key);
@@ -175,9 +212,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 			}
-			
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle()+ "_src",
-					getProcessTitle()+ "_CALM.xml", doc);
+
+			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_CALM.xml", doc);
 		} catch (JDOMException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
@@ -201,9 +237,9 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
 		}
-		return this.currentIdentifier ;
+		return this.currentIdentifier;
 	}
 
 	@Override
@@ -223,7 +259,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
 			Fileformat ff = convertData();
-			ImportObject io = new ImportObject(r);
+			ImportObject io = new ImportObject();
+			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
 				r.setId(this.currentIdentifier);
@@ -235,24 +272,58 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 					mm.write(fileName);
 					io.setMetsFilename(fileName);
 					io.setImportReturnValue(ImportReturnValue.ExportFinished);
-//					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
+					// ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
 				} catch (PreferencesException e) {
 					logger.error(e.getMessage(), e);
 					io.setImportReturnValue(ImportReturnValue.InvalidData);
-//					ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+					// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 				} catch (WriteException e) {
 					logger.error(e.getMessage(), e);
 					io.setImportReturnValue(ImportReturnValue.WriteError);
-//					ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+					// ret.put(getProcessTitle(), ImportReturnValue.WriteError);
 				}
 			} else {
 				io.setImportReturnValue(ImportReturnValue.InvalidData);
-//				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+				// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 			}
 			answer.add(io);
 		}
 
 		return answer;
+
+	}
+
+	private void generateProperties(ImportObject io) {
+		for (ImportProperty ip : this.properties) {
+			if (ip.getName().equals("Prozesseigenschaft")) {
+				Prozesseigenschaft pe = new Prozesseigenschaft();
+				pe.setTitel(ip.getName());
+				pe.setContainer(ip.getContainer());
+				pe.setCreationDate(new Date());
+				pe.setIstObligatorisch(false);
+				pe.setType(PropertyType.String);
+				pe.setWert(ip.getValue());
+				io.getProcessProperties().add(pe);
+			} else if (ip.getName().equals("Vorlageeigenschaft")) {
+				Vorlageeigenschaft ve = new Vorlageeigenschaft();
+				ve.setTitel(ip.getName());
+				ve.setContainer(ip.getContainer());
+				ve.setCreationDate(new Date());
+				ve.setIstObligatorisch(false);
+				ve.setType(PropertyType.List);
+				ve.setWert(ip.getValue());
+				io.getTemplateProperties().add(ve);
+			} else if (ip.getName().equals("Werkstueckeigenschaft")) {
+				Werkstueckeigenschaft we = new Werkstueckeigenschaft();
+				we.setTitel(ip.getName());
+				we.setContainer(ip.getContainer());
+				we.setCreationDate(new Date());
+				we.setIstObligatorisch(false);
+				we.setType(PropertyType.List);
+				we.setWert(ip.getValue());
+				io.getWorkProperties().add(we);
+			}
+		}
 
 	}
 
@@ -300,31 +371,36 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		return answer;
 	}
 
+	@Override
+	public List<ImportProperty> getProperties() {
+		return this.properties;
+	}
+
 	public static void main(String[] args) throws PreferencesException, WriteException {
-//		WellcomeCalmImport wci = new WellcomeCalmImport();
-//		wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/resources/fa68b9ed-1d84-4ebb-89e4-cdbaba1570e7.xml"));
-//		List<Record> bla = wci.generateRecordsFromFile();
-//		
-//
-//		
-//		Prefs prefs = new Prefs();
-//		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
-//		wci.setPrefs(prefs);
-//		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
-//		List<Record> recordList = wci.generateRecordsFromFile();
-//		// Record r = recordList.get(0);
-//		for (Record r : recordList) {
-//			wci.data = r.getData();
-//			Fileformat ff = wci.convertData();
-//			if (ff != null) {
-//				MetsMods mm = new MetsMods(prefs);
-//				mm.setDigitalDocument(ff.getDigitalDocument());
-//				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-//				logger.debug("Writing '" + fileName + "' into hotfolder...");
-//				mm.write(fileName);
-//			}
-//		}
-		
+		// WellcomeCalmImport wci = new WellcomeCalmImport();
+		// wci.setFile(new File("/home/robert/workspace/WellcomeImportPlugins/resources/fa68b9ed-1d84-4ebb-89e4-cdbaba1570e7.xml"));
+		// List<Record> bla = wci.generateRecordsFromFile();
+		//
+		//
+		//
+		// Prefs prefs = new Prefs();
+		// wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
+		// wci.setPrefs(prefs);
+		// wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
+		// List<Record> recordList = wci.generateRecordsFromFile();
+		// // Record r = recordList.get(0);
+		// for (Record r : recordList) {
+		// wci.data = r.getData();
+		// Fileformat ff = wci.convertData();
+		// if (ff != null) {
+		// MetsMods mm = new MetsMods(prefs);
+		// mm.setDigitalDocument(ff.getDigitalDocument());
+		// String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
+		// logger.debug("Writing '" + fileName + "' into hotfolder...");
+		// mm.write(fileName);
+		// }
+		// }
+
 		File[] calms = new File("/home/robert/Downloads/wellcome/CALM/").listFiles();
 		WellcomeCalmImport wci = new WellcomeCalmImport();
 		Prefs prefs = new Prefs();
@@ -337,16 +413,16 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			recordList.addAll(wci.generateRecordsFromFile());
 		}
 		for (Record r : recordList) {
-		wci.data = r.getData();
-		Fileformat ff = wci.convertData();
-		if (ff != null) {
-			MetsMods mm = new MetsMods(prefs);
-			mm.setDigitalDocument(ff.getDigitalDocument());
-			String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-			logger.debug("Writing '" + fileName + "' into hotfolder...");
-			mm.write(fileName);
+			wci.data = r.getData();
+			Fileformat ff = wci.convertData();
+			if (ff != null) {
+				MetsMods mm = new MetsMods(prefs);
+				mm.setDigitalDocument(ff.getDigitalDocument());
+				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
+				logger.debug("Writing '" + fileName + "' into hotfolder...");
+				mm.write(fileName);
+			}
 		}
-	}
-		
+
 	}
 }

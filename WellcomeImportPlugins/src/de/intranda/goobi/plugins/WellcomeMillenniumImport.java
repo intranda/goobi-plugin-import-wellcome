@@ -22,6 +22,7 @@ import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
+import org.goobi.production.properties.ImportProperty;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -68,6 +69,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private String currentTitle;
 	private String currentAuthor;
 	private List<String> currentCollectionList;
+	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
 	public WellcomeMillenniumImport() {
 		this.map.put("?monographic", "Monograph");
@@ -234,7 +236,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
 			Fileformat ff = convertData();
-			ImportObject io = new ImportObject(r);
+			ImportObject io = new ImportObject();
+			// TODO properties
 			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
 				r.setId(this.currentIdentifier);
@@ -443,6 +446,11 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		}
 
 		return null;
+	}
+	
+	@Override
+	public List<ImportProperty> getProperties() {
+		return this.properties;
 	}
 
 	public static void main(String[] args) throws PreferencesException, WriteException {
