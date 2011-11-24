@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import org.goobi.production.properties.ImportProperty;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformer;
@@ -45,8 +45,12 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.Beans.Prozesseigenschaft;
+import de.sub.goobi.Beans.Vorlageeigenschaft;
+import de.sub.goobi.Beans.Werkstueckeigenschaft;
 import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
+import de.sub.goobi.helper.enums.PropertyType;
 
 @PluginImplementation
 public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
@@ -58,7 +62,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
-	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
+//	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
 	private Prefs prefs;
 	private String data = "";
@@ -88,6 +92,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		this.map.put("?mixed material", null);
 	}
 
+	
+	
 	@Override
 	public String getId() {
 		return NAME;
@@ -108,6 +114,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		return NAME;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Fileformat convertData() {
 		Fileformat ff = null;
@@ -228,6 +235,43 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		return ff;
 	}
 
+	private void generateProperties(ImportObject io) {
+		for (ImportProperty ip : this.properties) {
+			if (ip.getName().equals("Prozesseigenschaft")) {
+				Prozesseigenschaft pe = new Prozesseigenschaft();
+				pe.setTitel(ip.getName());
+				pe.setContainer(ip.getContainer());
+				pe.setCreationDate(new Date());
+				pe.setIstObligatorisch(false);
+				pe.setType(PropertyType.String);
+				pe.setWert(ip.getValue());
+				io.getProcessProperties().add(pe);
+			} else if (ip.getName().equals("Vorlageeigenschaft")) {
+				Vorlageeigenschaft ve = new Vorlageeigenschaft();
+				ve.setTitel(ip.getName());
+				ve.setContainer(ip.getContainer());
+				ve.setCreationDate(new Date());
+				ve.setIstObligatorisch(false);
+				ve.setType(PropertyType.List);
+				ve.setWert(ip.getValue());
+				io.getTemplateProperties().add(ve);
+			} else if (ip.getName().equals("Werkstueckeigenschaft")) {
+				Werkstueckeigenschaft we = new Werkstueckeigenschaft();
+				we.setTitel(ip.getName());
+				we.setContainer(ip.getContainer());
+				we.setCreationDate(new Date());
+				we.setIstObligatorisch(false);
+				we.setType(PropertyType.List);
+				we.setWert(ip.getValue());
+				io.getWorkProperties().add(we);
+			}
+		}
+		Prozesseigenschaft pe = new Prozesseigenschaft();
+		pe.setTitel("importPlugin");
+		pe.setWert(getTitle());
+		pe.setType(PropertyType.String);
+	}
+	
 	@Override
 	public List<ImportObject> generateFiles(List<Record> records) {
 		List<ImportObject> answer = new ArrayList<ImportObject>();
@@ -237,7 +281,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			this.currentCollectionList = r.getCollections();
 			Fileformat ff = convertData();
 			ImportObject io = new ImportObject();
-			// TODO properties
+			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
 				r.setId(this.currentIdentifier);

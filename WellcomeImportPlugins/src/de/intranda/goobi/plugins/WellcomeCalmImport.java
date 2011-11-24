@@ -92,7 +92,15 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		{
 			ImportProperty ip = new ImportProperty();
 			ip.setName("Werkstueckeigenschaft");
-			ip.setType(Type.TEXT);
+			ip.setType(Type.LISTMULTISELECT);
+			List<String> values = new ArrayList<String>();
+			values.add("Value1");
+			values.add("Value2");
+			values.add("Value3");
+			values.add("Value4");
+			values.add("Value5");
+			values.add("Value6");
+			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
 
@@ -324,6 +332,10 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				io.getWorkProperties().add(we);
 			}
 		}
+		Prozesseigenschaft pe = new Prozesseigenschaft();
+		pe.setTitel("importPlugin");
+		pe.setWert(getTitle());
+		pe.setType(PropertyType.String);
 
 	}
 
