@@ -254,6 +254,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		pe.setTitel("importPlugin");
 		pe.setWert(getTitle());
 		pe.setType(PropertyType.String);
+		io.getProcessProperties().add(pe);
 	}
 
 	@Override
