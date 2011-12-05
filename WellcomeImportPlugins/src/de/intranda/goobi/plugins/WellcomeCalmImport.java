@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -380,6 +381,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		List<ImportType> answer = new ArrayList<ImportType>();
 		answer.add(ImportType.Record);
 		answer.add(ImportType.FILE);
+		answer.add(ImportType.FOLDER);
 		return answer;
 	}
 
@@ -436,5 +438,45 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			}
 		}
 
+	}
+
+	@Override
+	public List<String> getAllFilenames() {
+		List<String> answer = new ArrayList<String>();
+		String folder = ConfigMain.getParameter("CalmImportFolder");
+		File f = new File(folder);
+		if (f.exists() && f.isDirectory()) {
+			String[] files = f.list();
+			for (String file : files) {
+				answer.add(file);
+			}
+			Collections.sort(answer);
+		}
+		return answer;
+	}
+
+	@Override
+	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
+		String folder = ConfigMain.getParameter("CalmImportFolder");
+		List<Record> records = new ArrayList<Record>();
+		for (String filename : filenames) {
+			File f = new File(folder, filename);
+			try {
+				Document doc = new SAXBuilder().build(f);
+				if (doc != null && doc.getRootElement() != null) {
+					Record record = new Record();
+					record.setData(new XMLOutputter().outputString(doc));
+					records.add(record);
+				} else {
+					logger.error("Could not parse '" + filename + "'.");
+				}
+			} catch (JDOMException e) {
+				logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+
+		}
+		return records;
 	}
 }

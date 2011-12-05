@@ -430,6 +430,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		List<ImportType> answer = new ArrayList<ImportType>();
 		answer.add(ImportType.Record);
 		answer.add(ImportType.FILE);
+		answer.add(ImportType.FOLDER);
 
 		return answer;
 	}
@@ -578,6 +579,22 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			}
 		}
 
+	}
+
+
+
+	@Override
+	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public List<String> getAllFilenames() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
