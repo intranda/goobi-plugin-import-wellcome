@@ -284,6 +284,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			} else if (ip.getType().equals(Type.TEXT)) {
 				pe.setType(PropertyType.String);
 			}
+			pe.setWert(ip.getValue());
 			io.getProcessProperties().add(pe);
 		}
 		
