@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.properties.ImportProperty;
+import org.goobi.production.properties.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -39,8 +41,6 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
-import de.sub.goobi.Beans.Vorlageeigenschaft;
-import de.sub.goobi.Beans.Werkstueckeigenschaft;
 import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
 import de.sub.goobi.helper.enums.PropertyType;
@@ -73,8 +73,43 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	
 	
 	public WellcomeImagesImport() {
-	
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("CollectionName1");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("Digitised");
+			values.add("Born digital");
+			ip.setPossibleValues(values);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("CollectionName2");
+			ip.setType(Type.TEXT);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("securityTag");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("Open");
+			values.add("Closed");
+			ip.setPossibleValues(values);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("schemaName");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("MIRO");
+			ip.setPossibleValues(values);
+			this.properties.add(ip);
+		}
 	}
+	
 	@Override
 	public String getId() {
 		return NAME;
@@ -219,42 +254,30 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		ret.add(r);
 		return ret;
 	}
+	
+	
 	private void generateProperties(ImportObject io) {
 		for (ImportProperty ip : this.properties) {
-			if (ip.getName().equals("Prozesseigenschaft")) {
-				Prozesseigenschaft pe = new Prozesseigenschaft();
-				pe.setTitel(ip.getName());
-				pe.setContainer(ip.getContainer());
-				pe.setCreationDate(new Date());
-				pe.setIstObligatorisch(false);
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel(ip.getName());
+			pe.setContainer(ip.getContainer());
+			pe.setCreationDate(new Date());
+			pe.setIstObligatorisch(false);
+			if (ip.getType().equals(Type.LIST)) {
+				pe.setType(PropertyType.List);
+			} else if (ip.getType().equals(Type.TEXT)) {
 				pe.setType(PropertyType.String);
-				pe.setWert(ip.getValue());
-				io.getProcessProperties().add(pe);
-			} else if (ip.getName().equals("Vorlageeigenschaft")) {
-				Vorlageeigenschaft ve = new Vorlageeigenschaft();
-				ve.setTitel(ip.getName());
-				ve.setContainer(ip.getContainer());
-				ve.setCreationDate(new Date());
-				ve.setIstObligatorisch(false);
-				ve.setType(PropertyType.List);
-				ve.setWert(ip.getValue());
-				io.getTemplateProperties().add(ve);
-			} else if (ip.getName().equals("Werkstueckeigenschaft")) {
-				Werkstueckeigenschaft we = new Werkstueckeigenschaft();
-				we.setTitel(ip.getName());
-				we.setContainer(ip.getContainer());
-				we.setCreationDate(new Date());
-				we.setIstObligatorisch(false);
-				we.setType(PropertyType.List);
-				we.setWert(ip.getValue());
-				io.getWorkProperties().add(we);
 			}
+			io.getProcessProperties().add(pe);
 		}
-		Prozesseigenschaft pe = new Prozesseigenschaft();
-		pe.setTitel("importPlugin");
-		pe.setWert(getTitle());
-		pe.setType(PropertyType.String);
-		io.getProcessProperties().add(pe);
+		
+		{
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel("importPlugin");
+			pe.setWert(getTitle());
+			pe.setType(PropertyType.String);
+			io.getProcessProperties().add(pe);
+		}
 	}
 
 	@Override
@@ -374,14 +397,42 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		}
 	}
 	@Override
-	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
 	public List<String> getAllFilenames() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> answer = new ArrayList<String>();
+		String folder = ConfigMain.getParameter("CalmImportFolder");
+		File f = new File(folder);
+		if (f.exists() && f.isDirectory()) {
+			String[] files = f.list();
+			for (String file : files) {
+				answer.add(file);
+			}
+			Collections.sort(answer);
+		}
+		return answer;
 	}
 
+	@Override
+	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
+		String folder = ConfigMain.getParameter("CalmImportFolder");
+		List<Record> records = new ArrayList<Record>();
+		for (String filename : filenames) {
+			File f = new File(folder, filename);
+			try {
+				Document doc = new SAXBuilder().build(f);
+				if (doc != null && doc.getRootElement() != null) {
+					Record record = new Record();
+					record.setData(new XMLOutputter().outputString(doc));
+					records.add(record);
+				} else {
+					logger.error("Could not parse '" + filename + "'.");
+				}
+			} catch (JDOMException e) {
+				logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+
+		}
+		return records;
+	}
 }

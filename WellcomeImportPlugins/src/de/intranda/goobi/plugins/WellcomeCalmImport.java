@@ -41,8 +41,6 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
-import de.sub.goobi.Beans.Vorlageeigenschaft;
-import de.sub.goobi.Beans.Werkstueckeigenschaft;
 import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
 import de.sub.goobi.helper.enums.PropertyType;
@@ -72,38 +70,56 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
 	public WellcomeCalmImport() {
-		super();
+
 		{
 			ImportProperty ip = new ImportProperty();
-			ip.setName("Prozesseigenschaft");
+			ip.setName("CollectionName1");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("Digitised");
+			values.add("Born digital");
+			ip.setPossibleValues(values);
+			this.properties.add(ip);
+		}
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("CollectionName2");
 			ip.setType(Type.TEXT);
 			this.properties.add(ip);
 		}
 		{
 			ImportProperty ip = new ImportProperty();
-			ip.setName("Vorlageeigenschaft");
+			ip.setName("securityTag");
 			ip.setType(Type.LIST);
 			List<String> values = new ArrayList<String>();
-			values.add("Value1");
-			values.add("Value2");
-			values.add("Value3");
+			values.add("Open");
+			values.add("Closed");
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
 		{
 			ImportProperty ip = new ImportProperty();
-			ip.setName("Werkstueckeigenschaft");
-			ip.setType(Type.LISTMULTISELECT);
+			ip.setName("schemaName");
+			ip.setType(Type.LIST);
 			List<String> values = new ArrayList<String>();
-			values.add("Value1");
-			values.add("Value2");
-			values.add("Value3");
-			values.add("Value4");
-			values.add("Value5");
-			values.add("Value6");
+			values.add("CALM");
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
+		// {
+		// ImportProperty ip = new ImportProperty();
+		// ip.setName("Werkstueckeigenschaft");
+		// ip.setType(Type.LISTMULTISELECT);
+		// List<String> values = new ArrayList<String>();
+		// values.add("Value1");
+		// values.add("Value2");
+		// values.add("Value3");
+		// values.add("Value4");
+		// values.add("Value5");
+		// values.add("Value6");
+		// ip.setPossibleValues(values);
+		// this.properties.add(ip);
+		// }
 
 	}
 
@@ -304,40 +320,26 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 	private void generateProperties(ImportObject io) {
 		for (ImportProperty ip : this.properties) {
-			if (ip.getName().equals("Prozesseigenschaft")) {
-				Prozesseigenschaft pe = new Prozesseigenschaft();
-				pe.setTitel(ip.getName());
-				pe.setContainer(ip.getContainer());
-				pe.setCreationDate(new Date());
-				pe.setIstObligatorisch(false);
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel(ip.getName());
+			pe.setContainer(ip.getContainer());
+			pe.setCreationDate(new Date());
+			pe.setIstObligatorisch(false);
+			if (ip.getType().equals(Type.LIST)) {
+				pe.setType(PropertyType.List);
+			} else if (ip.getType().equals(Type.TEXT)) {
 				pe.setType(PropertyType.String);
-				pe.setWert(ip.getValue());
-				io.getProcessProperties().add(pe);
-			} else if (ip.getName().equals("Vorlageeigenschaft")) {
-				Vorlageeigenschaft ve = new Vorlageeigenschaft();
-				ve.setTitel(ip.getName());
-				ve.setContainer(ip.getContainer());
-				ve.setCreationDate(new Date());
-				ve.setIstObligatorisch(false);
-				ve.setType(PropertyType.List);
-				ve.setWert(ip.getValue());
-				io.getTemplateProperties().add(ve);
-			} else if (ip.getName().equals("Werkstueckeigenschaft")) {
-				Werkstueckeigenschaft we = new Werkstueckeigenschaft();
-				we.setTitel(ip.getName());
-				we.setContainer(ip.getContainer());
-				we.setCreationDate(new Date());
-				we.setIstObligatorisch(false);
-				we.setType(PropertyType.List);
-				we.setWert(ip.getValue());
-				io.getWorkProperties().add(we);
 			}
+			io.getProcessProperties().add(pe);
 		}
-		Prozesseigenschaft pe = new Prozesseigenschaft();
-		pe.setTitel("importPlugin");
-		pe.setWert(getTitle());
-		pe.setType(PropertyType.String);
-		io.getProcessProperties().add(pe);
+	
+		{
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel("importPlugin");
+			pe.setWert(getTitle());
+			pe.setType(PropertyType.String);
+			io.getProcessProperties().add(pe);
+		}
 	}
 
 	@Override
