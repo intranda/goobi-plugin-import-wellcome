@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config_plugin>
+
+	<importFolder>/opt/digiverso/goobi/temp/</importFolder>
+	
+	<mapping field="AccessStatus" value="AccessStatus"/>
+	<mapping field="AccessConditions" value="AccessLicense"/>
+	<mapping field="ClosedUntil" value="ClosedUntil"/>
+	<mapping field="RestrictedUntil" value="RestrictedUntil"/>
+	<mapping field="RecordID" value="CatalogIDDigital"/>
+	<mapping field="Title" value="TitleDocMain"/>
+	<mapping field="Description" value="Description"/>
+	<mapping field="AltRefNo" value="CatalogIDSource"/>	
+
+</config_plugin>

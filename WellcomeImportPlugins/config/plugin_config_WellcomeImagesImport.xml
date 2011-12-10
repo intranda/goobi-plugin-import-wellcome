@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config_plugin>
+
+	<importFolder>/opt/digiverso/goobi/rulesets/</importFolder>
+
+	<mapping field="image_no_calc" value="CatalogIDDigital"/>
+	<mapping field="image_title" value="TitleDocMain"/>
+	<mapping field="image_artwork_date" value="PublicationYear"/>
+	<mapping field="image_source_code" value="Creator"/>
+	<mapping field="image_creator" value="Creator"/>
+	<mapping field="image_library_ref_department" value="singleDigCollection"/>
+
+</config_plugin>
