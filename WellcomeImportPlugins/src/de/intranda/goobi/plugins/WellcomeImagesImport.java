@@ -42,7 +42,7 @@ import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
 import de.sub.goobi.Import.ImportOpac;
-import de.sub.goobi.config.ConfigMain;
+import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
 
 @PluginImplementation
@@ -53,7 +53,6 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	private static final String NAME = "Wellcome Images Import";
 	// private static final String VERSION = "0.0";
-	private static final String MAPPING_FILE = ConfigMain.getParameter("KonfigurationVerzeichnis") + "WellcomeImages_map.properties";
 
 	private String data = "";
 	private String importFolder = "";
@@ -169,7 +168,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				dsBoundBook.addMetadata(path);
 
 				// reading import file
-				List<String> elementList = WellcomeUtils.getKeys(MAPPING_FILE);
+				List<String> elementList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(this));
 				for (String key : elementList) {
 					Element toTest = null;
 					// finding the right Element
@@ -196,7 +195,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 						if (toTest.getChild("_") != null) {
 							toTest = toTest.getChild("_");
 						}
-						String metadataName = WellcomeUtils.getValue(MAPPING_FILE, key);
+						String metadataName = WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(this), key);
 						MetadataType mdt = this.prefs.getMetadataTypeByName(metadataName);
 						Metadata md = new Metadata(mdt);
 						md.setValue(toTest.getText());
@@ -400,7 +399,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	@Override
 	public List<String> getAllFilenames() {
 		List<String> answer = new ArrayList<String>();
-		String folder = ConfigMain.getParameter("CalmImportFolder");
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
 		File f = new File(folder);
 		if (f.exists() && f.isDirectory()) {
 			String[] files = f.list();
@@ -414,7 +413,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-		String folder = ConfigMain.getParameter("CalmImportFolder");
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
 		List<Record> records = new ArrayList<Record>();
 		for (String filename : filenames) {
 			File f = new File(folder, filename);

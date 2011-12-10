@@ -5,12 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -20,6 +17,9 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+
+import de.intranda.goobi.plugins.WellcomeCalmImport;
+import de.sub.goobi.config.ConfigPlugins;
 
 import ugh.dl.DocStruct;
 import ugh.dl.Metadata;
@@ -32,48 +32,28 @@ import ugh.exceptions.MetadataTypeNotAllowedException;
 public class WellcomeUtils {
 	
 	private static final Logger logger = Logger.getLogger(WellcomeUtils.class);
-	private static PropertiesConfiguration config = null;
 	private static final Namespace NS_MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
 
-	private static PropertiesConfiguration loadConfiguration(String configFile) {
-		PropertiesConfiguration.setDefaultListDelimiter('&');
-		if (configFile == null) {
-			configFile = "GoobiConfig.properties";
-		}
-		try {
-			config = new PropertiesConfiguration(configFile);
-		} catch (ConfigurationException e) {
-			config = new PropertiesConfiguration();
-		}
-		// config.setDelimiterParsingDisabled(true);
-		config.setListDelimiter('|');
-
-		config.setReloadingStrategy(new FileChangedReloadingStrategy());
-		return config;
-	}
-
-
-
-	public static List<String> getKeys(String configFile) {
+	public static List<String> getKeys(XMLConfiguration config) {
 		List<String> keyList = new ArrayList<String>();
-		if (config == null) {
-			loadConfiguration(configFile);
-		}
-		@SuppressWarnings("unchecked")
-		Iterator<String> iter = config.getKeys();
-		while (iter.hasNext()) {
-			String key = iter.next();
+		int count = config.getMaxIndex("mapping");
+		for (int i = 0; i <= count; i++) {
+			String key = config.getString("mapping(" + i + ")[@field]");
 			keyList.add(key);
 		}
 		return keyList;
 	}
 	
 	
-	public static String getValue(String configFile, String key) {
-		if (config == null) {
-			loadConfiguration(configFile);
+	public static String getValue(XMLConfiguration config, String inField) {
+		int count = config.getMaxIndex("mapping");
+		for (int i = 0; i <= count; i++) {
+			String field = config.getString("mapping(" + i + ")[@field]");
+			if (field.equals(inField)){
+				return config.getString("mapping(" + i + ")[@value]");
+			}
 		}
-		return config.getString(key, key);
+		return inField;
 	}
 
 	public static void writeXmlToFile(String folderName, String fileName, Document doc) {
@@ -289,10 +269,10 @@ public class WellcomeUtils {
 	}
 	
 	public static void main(String[] args) {
-		String wellcomeImageMapping = "/opt/digiverso/goobi/config/WellcomeImages_map.properties";
-		List<String> keyList = WellcomeUtils.getKeys(wellcomeImageMapping);
+		WellcomeCalmImport wic = new WellcomeCalmImport();
+		List<String> keyList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(wic));
 		for (String key : keyList) {
-			System.out.println(key + ": " + WellcomeUtils.getValue(wellcomeImageMapping, key));
+			System.out.println(key + ": " + WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(wic), key));
 		}
 		
 		
