@@ -314,7 +314,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					MetsMods mm = new MetsMods(this.prefs);
 					mm.setDigitalDocument(ff.getDigitalDocument());
 					String fileName = getImportFolder() + getProcessTitle() + ".xml";
-					logger.debug("Writing '" + fileName + "' into hotfolder...");
+					logger.debug("Writing '" + fileName + "' into given folder...");
 					mm.write(fileName);
 					io.setMetsFilename(fileName);
 					io.setImportReturnValue(ImportReturnValue.ExportFinished);
@@ -598,7 +598,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				MetsMods mm = new MetsMods(prefs);
 				mm.setDigitalDocument(ff.getDigitalDocument());
 				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-				logger.debug("Writing '" + fileName + "' into hotfolder...");
+				logger.debug("Writing '" + fileName + "' into given folder...");
 				mm.write(fileName);
 			}
 		}
