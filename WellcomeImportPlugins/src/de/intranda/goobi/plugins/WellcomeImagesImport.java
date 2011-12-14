@@ -69,8 +69,6 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
-	
-	
 	public WellcomeImagesImport() {
 		{
 			ImportProperty ip = new ImportProperty();
@@ -108,7 +106,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			this.properties.add(ip);
 		}
 	}
-	
+
 	@Override
 	public String getId() {
 		return NAME;
@@ -215,18 +213,25 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 			}
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle()+ "_src",
-					getProcessTitle()+ "_WellcomeImages", doc);
+			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_WellcomeImages", doc);
 		} catch (JDOMException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (PreferencesException e) {
-			logger.error(e.getMessage(), e);
-		} catch (MetadataTypeNotAllowedException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (TypeNotAllowedForParentException e) {
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
+		} catch (MetadataTypeNotAllowedException e) {
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+			ff = null;
 		}
 
 		return ff;
@@ -240,9 +245,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 	@Override
 	public String getProcessTitle() {
 		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
 		}
-		return this.currentIdentifier ;
+		return this.currentIdentifier;
 	}
 
 	@Override
@@ -253,8 +258,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		ret.add(r);
 		return ret;
 	}
-	
-	
+
 	private void generateProperties(ImportObject io) {
 		for (ImportProperty ip : this.properties) {
 			Prozesseigenschaft pe = new Prozesseigenschaft();
@@ -270,7 +274,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			pe.setWert(ip.getValue());
 			io.getProcessProperties().add(pe);
 		}
-		
+
 		{
 			Prozesseigenschaft pe = new Prozesseigenschaft();
 			pe.setTitel("importPlugin");
@@ -301,19 +305,19 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 					mm.write(fileName);
 					io.setMetsFilename(fileName);
 					io.setImportReturnValue(ImportReturnValue.ExportFinished);
-//					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
+					// ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
 				} catch (PreferencesException e) {
 					logger.error(e.getMessage(), e);
 					io.setImportReturnValue(ImportReturnValue.InvalidData);
-//					ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+					// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 				} catch (WriteException e) {
 					logger.error(e.getMessage(), e);
 					io.setImportReturnValue(ImportReturnValue.WriteError);
-//					ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+					// ret.put(getProcessTitle(), ImportReturnValue.WriteError);
 				}
 			} else {
 				io.setImportReturnValue(ImportReturnValue.InvalidData);
-//				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+				// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 			}
 			answer.add(io);
 		}
@@ -366,7 +370,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		answer.add(ImportType.FOLDER);
 		return answer;
 	}
-	
+
 	@Override
 	public List<ImportProperty> getProperties() {
 		return this.properties;
@@ -396,6 +400,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			}
 		}
 	}
+
 	@Override
 	public List<String> getAllFilenames() {
 		List<String> answer = new ArrayList<String>();

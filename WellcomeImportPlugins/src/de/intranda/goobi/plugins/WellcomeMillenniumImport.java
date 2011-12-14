@@ -257,17 +257,27 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			}
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (IOException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (PreferencesException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (TypeNotAllowedForParentException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (MetadataTypeNotAllowedException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (TypeNotAllowedAsChildException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			ff = null;
 		}
+
 
 		return ff;
 	}

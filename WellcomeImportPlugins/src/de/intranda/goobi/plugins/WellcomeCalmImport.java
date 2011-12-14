@@ -239,17 +239,24 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_CALM.xml", doc);
 		} catch (JDOMException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (PreferencesException e) {
-			logger.error(e.getMessage(), e);
-		} catch (MetadataTypeNotAllowedException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
 		} catch (TypeNotAllowedForParentException e) {
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
+		} catch (MetadataTypeNotAllowedException e) {
+			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+			ff = null;
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+			ff = null;
 		}
-
 		return ff;
 	}
 
