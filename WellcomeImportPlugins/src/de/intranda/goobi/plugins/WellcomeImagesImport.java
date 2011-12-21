@@ -10,6 +10,7 @@ import java.util.List;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.goobi.production.Import.ImportObject;
@@ -427,6 +428,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				if (doc != null && doc.getRootElement() != null) {
 					Record record = new Record();
 					record.setData(new XMLOutputter().outputString(doc));
+					record.setId(filename);
 					records.add(record);
 				} else {
 					logger.error("Could not parse '" + filename + "'.");
@@ -440,4 +442,14 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		}
 		return records;
 	}
+	
+	@Override
+	public void deleteFiles(List<String> selectedFilenames) {
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
+		for (String filename : selectedFilenames) {
+			File f = new File (folder, filename);
+			FileUtils.deleteQuietly(f);
+		}
+	}
+
 }

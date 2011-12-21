@@ -10,6 +10,7 @@ import java.util.List;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.goobi.production.Import.ImportObject;
@@ -105,21 +106,6 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
-		// {
-		// ImportProperty ip = new ImportProperty();
-		// ip.setName("Werkstueckeigenschaft");
-		// ip.setType(Type.LISTMULTISELECT);
-		// List<String> values = new ArrayList<String>();
-		// values.add("Value1");
-		// values.add("Value2");
-		// values.add("Value3");
-		// values.add("Value4");
-		// values.add("Value5");
-		// values.add("Value6");
-		// ip.setPossibleValues(values);
-		// this.properties.add(ip);
-		// }
-
 	}
 
 	@Override
@@ -475,6 +461,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				if (doc != null && doc.getRootElement() != null) {
 					Record record = new Record();
 					record.setData(new XMLOutputter().outputString(doc));
+					record.setId(filename);
 					records.add(record);
 				} else {
 					logger.error("Could not parse '" + filename + "'.");
@@ -488,4 +475,14 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		}
 		return records;
 	}
+	
+	@Override
+	public void deleteFiles(List<String> selectedFilenames) {
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
+		for (String filename : selectedFilenames) {
+			File f = new File (folder, filename);
+			FileUtils.deleteQuietly(f);
+		}
+	}
+
 }

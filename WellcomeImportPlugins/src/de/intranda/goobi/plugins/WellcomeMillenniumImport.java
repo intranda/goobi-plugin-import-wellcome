@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.goobi.production.Import.ImportObject;
@@ -29,6 +30,7 @@ import org.goobi.production.properties.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformer;
@@ -50,6 +52,7 @@ import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
 import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
+import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
 
 @PluginImplementation
@@ -62,7 +65,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
-//	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
+	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
 	private Prefs prefs;
 	private String data = "";
@@ -160,15 +163,15 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			doc = new SAXBuilder().build(new StringReader(this.data));
 			if (doc != null && doc.hasRootElement()) {
 				
-				Element record = doc.getRootElement().getChild("record");
-				List<Element> controlfields = record.getChildren("controlfield");
-				List<Element> datafields = record.getChildren("datafield");
+				Element record = doc.getRootElement().getChild("record",MARC);
+				List<Element> controlfields = record.getChildren("controlfield",MARC);
+				List<Element> datafields = record.getChildren("datafield",MARC);
 
 				for (Element e : controlfields) {
 					if (e.getAttributeValue("tag").equals("001")) {
 						for (Element e907 : datafields) {
 							if (e907.getAttributeValue("tag").equals("907")) {
-								List<Element> subfields = e907.getChildren("subfield");
+								List<Element> subfields = e907.getChildren("subfield",MARC);
 								for (Element subfield : subfields) {
 									if (subfield.getAttributeValue("code").equals("a")) {
 										e.setText(subfield.getText().replace(".", ""));
@@ -180,9 +183,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				}
 
 				XSLTransformer transformer = new XSLTransformer(XSLT);
+				System.out.println(doc.toString());
 				Document docMods = transformer.transform(doc);
 				// logger.debug(new XMLOutputter().outputString(docMods));
-
+				System.out.println(docMods.toString());
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
@@ -620,7 +624,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	@Override
 	public List<String> getAllFilenames() {
 		List<String> answer = new ArrayList<String>();
-		String folder = ConfigMain.getParameter("CalmImportFolder");
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
 		File f = new File(folder);
 		if (f.exists() && f.isDirectory()) {
 			String[] files = f.list();
@@ -634,7 +638,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-		String folder = ConfigMain.getParameter("CalmImportFolder");
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
 		List<Record> records = new ArrayList<Record>();
 		for (String filename : filenames) {
 			File f = new File(folder, filename);
@@ -655,6 +659,15 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 		}
 		return records;
+	}
+	
+	@Override
+	public void deleteFiles(List<String> selectedFilenames) {
+		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
+		for (String filename : selectedFilenames) {
+			File f = new File (folder, filename);
+			FileUtils.deleteQuietly(f);
+		}
 	}
 
 }
