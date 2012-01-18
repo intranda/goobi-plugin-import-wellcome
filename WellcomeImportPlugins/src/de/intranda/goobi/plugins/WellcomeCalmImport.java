@@ -67,6 +67,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
 	private List<String> currentCollectionList;
 
+	private String altRefNo = "";
+	
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
 	public WellcomeCalmImport() {
@@ -170,7 +172,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				Metadata path = new Metadata(this.prefs.getMetadataTypeByName("pathimagefiles"));
 				path.setValue("./");
 				dsBoundBook.addMetadata(path);
-
+				this.altRefNo = dScribeRecord.getChild("AltRefNo").getText();
 				// reading import file
 				List<String> elementList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(this));
 				for (String key : elementList) {
@@ -330,6 +332,13 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			Prozesseigenschaft pe = new Prozesseigenschaft();
 			pe.setTitel("importPlugin");
 			pe.setWert(getTitle());
+			pe.setType(PropertyType.String);
+			io.getProcessProperties().add(pe);
+		}
+		{
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel("AltRefNo");
+			pe.setWert(this.altRefNo);
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
 		}
