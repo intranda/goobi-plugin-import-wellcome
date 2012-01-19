@@ -125,7 +125,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			ip.setName("schemaName");
 			ip.setType(Type.LIST);
 			List<String> values = new ArrayList<String>();
-			values.add("Millenium");
+			values.add("Millennium");
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
