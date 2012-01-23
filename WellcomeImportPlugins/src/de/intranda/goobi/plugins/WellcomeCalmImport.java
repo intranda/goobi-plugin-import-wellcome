@@ -68,6 +68,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	private List<String> currentCollectionList;
 
 	private String altRefNo = "";
+//	private String b-number ="";
 	
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
@@ -342,6 +343,14 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
 		}
+		{
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel("b-number");
+			pe.setWert(this.currentIdentifier);
+			pe.setType(PropertyType.String);
+			io.getProcessProperties().add(pe);
+		}
+		
 	}
 
 	@Override
