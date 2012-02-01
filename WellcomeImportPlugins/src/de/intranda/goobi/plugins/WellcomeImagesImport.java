@@ -210,6 +210,33 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 						dsRoot.addMetadata(mdCollection);
 					}
 				}
+				Metadata dateDigitization = new Metadata(this.prefs.getMetadataTypeByName("_dateDigitization"));
+				dateDigitization.setValue("2012");
+				Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
+				placeOfElectronicOrigin.setValue("Wellcome Trust");		
+				Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
+				_electronicEdition.setValue("[Electronic ed.]");				
+				Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
+				_electronicPublisher.setValue("Wellcome Trust");				
+				Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+				_digitalOrigin.setValue("reformatted digital");				
+				if (dsRoot.getType().isAnchor()) {
+					DocStruct ds = dsRoot.getAllChildren().get(0);
+					ds.addMetadata(dateDigitization);
+					ds.addMetadata(_electronicEdition);
+					
+				} else {
+					dsRoot.addMetadata(dateDigitization);
+					dsRoot.addMetadata(_electronicEdition);
+				}
+				dsRoot.addMetadata(placeOfElectronicOrigin);
+				dsRoot.addMetadata(_electronicPublisher);
+				dsRoot.addMetadata(_digitalOrigin);
+
+				Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+				physicalLocation.setValue("Wellcome Trust");	
+				dsBoundBook.addMetadata(physicalLocation);
+				
 				this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);

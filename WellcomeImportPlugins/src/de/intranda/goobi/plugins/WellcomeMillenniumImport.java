@@ -61,7 +61,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	/** Logger for this class. */
 	private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
 
-	private static final String NAME = "Millenium Import";
+	private static final String NAME = "Millennium Import";
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
@@ -183,10 +183,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				}
 
 				XSLTransformer transformer = new XSLTransformer(XSLT);
-				System.out.println(doc.toString());
+				
 				Document docMods = transformer.transform(doc);
-				// logger.debug(new XMLOutputter().outputString(docMods));
-				System.out.println(docMods.toString());
+				 logger.debug(new XMLOutputter().outputString(docMods));
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
@@ -256,6 +255,32 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 						dsRoot.addMetadata(mdCollection);
 					}
 				}
+				Metadata dateDigitization = new Metadata(this.prefs.getMetadataTypeByName("_dateDigitization"));
+				dateDigitization.setValue("2012");
+				Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
+				placeOfElectronicOrigin.setValue("Wellcome Trust");		
+				Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
+				_electronicEdition.setValue("[Electronic ed.]");				
+				Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
+				_electronicPublisher.setValue("Wellcome Trust");				
+				Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+				_digitalOrigin.setValue("reformatted digital");				
+				if (dsRoot.getType().isAnchor()) {
+					DocStruct ds = dsRoot.getAllChildren().get(0);
+					ds.addMetadata(dateDigitization);
+					ds.addMetadata(_electronicEdition);
+					
+				} else {
+					dsRoot.addMetadata(dateDigitization);
+					dsRoot.addMetadata(_electronicEdition);
+				}
+				dsRoot.addMetadata(placeOfElectronicOrigin);
+				dsRoot.addMetadata(_electronicPublisher);
+				dsRoot.addMetadata(_digitalOrigin);
+
+				Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+				physicalLocation.setValue("Wellcome Trust");	
+				dsBoundBook.addMetadata(physicalLocation);
 				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle()+ "_src",
 						getProcessTitle()+ "_mrc.xml", doc);
 			}
