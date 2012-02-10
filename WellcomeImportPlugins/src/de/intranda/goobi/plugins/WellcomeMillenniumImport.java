@@ -334,6 +334,13 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
 		}
+		{
+			Prozesseigenschaft pe = new Prozesseigenschaft();
+			pe.setTitel("b-number");
+			pe.setWert(this.currentIdentifier);
+			pe.setType(PropertyType.String);
+			io.getProcessProperties().add(pe);
+		}
 	}
 	
 	@Override
