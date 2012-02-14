@@ -19,6 +19,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
 import de.intranda.goobi.plugins.WellcomeCalmImport;
+import de.intranda.goobi.plugins.WellcomeMillenniumImport;
 import de.sub.goobi.config.ConfigPlugins;
 
 import ugh.dl.DocStruct;
@@ -93,6 +94,31 @@ public class WellcomeUtils {
 			ret = mdId.getValue();
 		}
 
+		return ret;
+	}
+	
+	/**
+	 * Returns the document's wellcome identifier
+	 * 
+	 * @param prefs
+	 * @param ds
+	 * @return
+	 * @throws MetadataTypeNotAllowedException
+	 * @throws DocStructHasNoTypeException
+	 */
+	public static String getWellcomeIdentifier(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
+		String ret = null;
+
+		MetadataType mdTypeId = prefs.getMetadataTypeByName("wellcomeidentifier");
+		if (ds.getAllMetadataByType(mdTypeId) != null && !ds.getAllMetadataByType(mdTypeId).isEmpty()) {
+			Metadata mdId = ds.getAllMetadataByType(mdTypeId).get(0);
+			ret = mdId.getValue();
+		} else {
+			Metadata mdId = new Metadata(mdTypeId);
+			ds.addMetadata(mdId);
+			mdId.setValue(String.valueOf(System.currentTimeMillis()));
+			ret = mdId.getValue();
+		}
 		return ret;
 	}
 	
@@ -231,7 +257,9 @@ public class WellcomeUtils {
 							if (eleValueList != null) {
 								for (Element eleValue : eleValueList) {
 									List<String> values = new ArrayList<String>();
-									// logger.debug("value: " + eleValue.getTextTrim());
+//									logger.debug("value: " + eleValue.getTextTrim());
+//									System.out.println("value: " + eleValue.getTextTrim());
+									
 									values.add(eleValue.getTextTrim());
 
 									String value = "";
@@ -269,11 +297,13 @@ public class WellcomeUtils {
 	}
 	
 	public static void main(String[] args) {
-		WellcomeCalmImport wic = new WellcomeCalmImport();
-		List<String> keyList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(wic));
-		for (String key : keyList) {
-			System.out.println(key + ": " + WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(wic), key));
-		}
+//		WellcomeCalmImport wic = new WellcomeCalmImport();
+//		List<String> keyList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(wic));
+//		for (String key : keyList) {
+//			System.out.println(key + ": " + WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(wic), key));
+//		}
+		
+		
 		
 		
 	}

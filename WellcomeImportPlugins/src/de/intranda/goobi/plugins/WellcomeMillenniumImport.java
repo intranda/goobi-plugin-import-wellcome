@@ -54,6 +54,7 @@ import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
+import de.sub.goobi.helper.exceptions.ImportPluginException;
 
 @PluginImplementation
 public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
@@ -74,6 +75,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private Map<String, String> map = new HashMap<String, String>();
 	private String currentIdentifier;
 	private String currentTitle;
+	private String currentWellcomeIdentifier;
 	private String currentAuthor;
 	private List<String> currentCollectionList;
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
@@ -156,10 +158,12 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Fileformat convertData() {
+	public Fileformat convertData() throws ImportPluginException {
 		Fileformat ff = null;
 		Document doc;
 		try {
+			//System.out.println(this.data);
+			
 			doc = new SAXBuilder().build(new StringReader(this.data));
 			if (doc != null && doc.hasRootElement()) {
 				
@@ -186,6 +190,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				
 				Document docMods = transformer.transform(doc);
 				 logger.debug(new XMLOutputter().outputString(docMods));
+				 
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
@@ -220,6 +225,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+				this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
 
 				// Add dummy volume to anchors
 				if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
@@ -286,28 +292,26 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			}
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (IOException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (PreferencesException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (TypeNotAllowedForParentException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (MetadataTypeNotAllowedException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (TypeNotAllowedAsChildException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			ff = null;
+			throw new ImportPluginException(e);
 		}
-
-
 		return ff;
 	}
 
@@ -350,8 +354,14 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		for (Record r : records) {
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
-			Fileformat ff = convertData();
 			ImportObject io = new ImportObject();
+			Fileformat ff = null;
+			try {
+				ff = convertData();
+			} catch (ImportPluginException e1) {
+				io.setErrorMessage(e1.getMessage());
+			}
+			
 			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
@@ -394,7 +404,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			Document doc = new SAXBuilder().build(this.importFile);
 			if (doc != null && doc.getRootElement() != null) {
 				Record record = new Record();
-				record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
+				record.setData(new XMLOutputter().outputString(doc));
+//				record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
 				ret.add(record);
 
 			} else {
@@ -462,8 +473,11 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getProcessTitle() {
-		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+//		if (StringUtils.isNotBlank(this.currentTitle)) {
+//			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+//		}
+		if (StringUtils.isNotBlank(this.currentWellcomeIdentifier)) {
+			return this.currentWellcomeIdentifier.toLowerCase() + "_" + this.currentIdentifier ;
 		}
 		return this.currentIdentifier ;
 	}
@@ -569,7 +583,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		return this.properties;
 	}
 
-	public static void main(String[] args) throws PreferencesException, WriteException {
+	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
 		// CamMarcImport converter = new CamMarcImport();
 		// converter.prefs = new Prefs();
 		// try {
@@ -624,13 +638,15 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		// counter++;
 		// }
 
-		File[] calms = new File("/home/robert/Downloads/wellcome/millennium/").listFiles();
+		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
 		WellcomeMillenniumImport wci = new WellcomeMillenniumImport();
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
 		wci.setPrefs(prefs);
-		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
+		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/rulesetwellcome.xml");
 		List<Record> recordList = new ArrayList<Record>();
+		
+		
 		for (File filename : calms) {
 			// File filename = calms[0];
 			wci.setFile(filename);
