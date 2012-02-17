@@ -476,8 +476,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 //		if (StringUtils.isNotBlank(this.currentTitle)) {
 //			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
 //		}
-		if (StringUtils.isNotBlank(this.currentWellcomeIdentifier)) {
-			return this.currentWellcomeIdentifier.toLowerCase() + "_" + this.currentIdentifier ;
+		String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
+		if (StringUtils.isNotBlank(temp)) {
+			return temp.toLowerCase() + "_" + this.currentIdentifier ;
 		}
 		return this.currentIdentifier ;
 	}
