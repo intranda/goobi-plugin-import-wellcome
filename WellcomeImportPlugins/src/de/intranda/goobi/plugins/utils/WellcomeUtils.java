@@ -18,10 +18,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
-import de.intranda.goobi.plugins.WellcomeCalmImport;
-import de.intranda.goobi.plugins.WellcomeMillenniumImport;
-import de.sub.goobi.config.ConfigPlugins;
-
 import ugh.dl.DocStruct;
 import ugh.dl.Metadata;
 import ugh.dl.MetadataType;

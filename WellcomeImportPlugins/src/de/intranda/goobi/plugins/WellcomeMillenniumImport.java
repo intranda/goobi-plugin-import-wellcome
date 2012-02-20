@@ -50,7 +50,6 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
-import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigMain;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
@@ -340,7 +339,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		}
 		{
 			Prozesseigenschaft pe = new Prozesseigenschaft();
-			pe.setTitel("b-number");
+			pe.setTitel("bnumber");
 			pe.setWert(this.currentIdentifier);
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
