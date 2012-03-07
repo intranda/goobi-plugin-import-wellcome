@@ -148,12 +148,19 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		Fileformat ff = null;
 		Document doc;
 		try {
-			doc = new SAXBuilder().build(new StringReader(this.data));
+			SAXBuilder sb = new SAXBuilder(false);
+			sb.setValidation(false);
+			sb.setFeature("http://xml.org/sax/features/validation", false);
+			sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+			sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			doc = sb.build(new StringReader(this.data));
+			
 			if (doc != null && doc.hasRootElement()) {
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
-				Element dScribeRecord = doc.getRootElement();
+				Element dScribeDatabase = doc.getRootElement();
+				Element dScribeRecord = dScribeDatabase.getChild("DScribeRecord");
 
 				// generating DocStruct
 
@@ -373,7 +380,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		}
 		{
 			Prozesseigenschaft pe = new Prozesseigenschaft();
-			pe.setTitel("bnumber");
+			pe.setTitel("b-number");
 			pe.setWert(this.currentIdentifier);
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
@@ -391,7 +398,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 	public List<Record> generateRecordsFromFile() {
 		List<Record> ret = new ArrayList<Record>();
 		try {
-			Document doc = new SAXBuilder().build(this.importFile);
+			SAXBuilder sb = new SAXBuilder(false);
+			sb.setValidation(false);
+			sb.setFeature("http://xml.org/sax/features/validation", false);
+			sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+			sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			Document doc = sb.build(this.importFile);
 			if (doc != null && doc.getRootElement() != null) {
 				Record record = new Record();
 				record.setData(new XMLOutputter().outputString(doc));
@@ -456,7 +468,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		// }
 		// }
 
-		File[] calms = new File("/home/robert/Downloads/wellcome/CALM/").listFiles();
+		File[] calms = new File("/home/robert/Arbeitsfläche/calm/").listFiles();
 		WellcomeCalmImport wci = new WellcomeCalmImport();
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");

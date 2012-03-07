@@ -312,7 +312,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		}
 		{
 			Prozesseigenschaft pe = new Prozesseigenschaft();
-			pe.setTitel("bnumber");
+			pe.setTitel("b-number");
 			pe.setWert(this.currentIdentifier);
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
