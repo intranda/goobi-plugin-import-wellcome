@@ -515,7 +515,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		for (String filename : filenames) {
 			File f = new File(folder, filename);
 			try {
-				Document doc = new SAXBuilder().build(f);
+				SAXBuilder sb = new SAXBuilder(false);
+				sb.setValidation(false);
+				sb.setFeature("http://xml.org/sax/features/validation", false);
+				sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+				sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+				Document doc = sb.build(f);
 				if (doc != null && doc.getRootElement() != null) {
 					Record record = new Record();
 					record.setData(new XMLOutputter().outputString(doc));
