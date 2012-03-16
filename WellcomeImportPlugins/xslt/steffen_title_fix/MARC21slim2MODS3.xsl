@@ -800,12 +800,29 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			<xsl:for-each select="leader">
 				<issuance>
 					<xsl:choose>
+						<xsl:when test="$leader7='a'">Monographic</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='b'">continuing</xsl:when> <!-- not mapped -->
+						<xsl:when test="$leader7='c'">Notated music</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='d'">Manuscript notated music</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='e'">Cartographic material</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='f'">Manuscript cartographic material</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='g'">Projected medium</xsl:when><!-- Video -->
+						<xsl:when test="$leader7='i'">Nonmusical sound recording</xsl:when><!-- Audio -->
+						<xsl:when test="$leader7='j'">Musical sound recording</xsl:when><!-- Audio -->
+						<xsl:when test="$leader7='k'">Two-dimensional nonprojectable graphic</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='m'">Computer file</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='o'">Kit</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='p'">Mixed materials</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='r'">Three-dimensional artefact or naturally occurring object</xsl:when><!-- Monograph -->
+						<xsl:when test="$leader7='t'">Manuscript language material</xsl:when><!-- Archive -->
+						<!-- 
 						<xsl:when test="$leader7='a' or $leader7='c' or $leader7='d' or $leader7='m'">monographic</xsl:when>
 						<xsl:when test="$leader7='b'">continuing</xsl:when>
 						<xsl:when test="$leader7='m' and ($leader19='a' or $leader19='b' or $leader19='c')">multipart monograph</xsl:when>
 						<xsl:when test="$leader7='m' and ($leader19='#')">single unit</xsl:when>
 						<xsl:when test="$leader7='i'">integrating resource</xsl:when>
 						<xsl:when test="$leader7='s'">serial</xsl:when>
+						 -->
 					</xsl:choose>
 				</issuance>
 			</xsl:for-each>

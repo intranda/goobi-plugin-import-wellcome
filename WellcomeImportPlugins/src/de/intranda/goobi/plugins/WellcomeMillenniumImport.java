@@ -80,20 +80,23 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
 	public WellcomeMillenniumImport() {
-		this.map.put("?monographic", "Monograph");
-		this.map.put("?continuing", "Periodical");
-		this.map.put("?multipart monograph", "MultiVolumeWork");
-		this.map.put("?single unit", "Monograph");
-		this.map.put("?integrating resource", "MultiVolumeWork");
-		this.map.put("?serial", "Periodical");
-		this.map.put("?cartographic", "Map");
-		this.map.put("?notated music", null);
-		this.map.put("?sound recording-nonmusical", null);
-		this.map.put("?sound recording-musical", null);
-		this.map.put("?moving image", null);
-		this.map.put("?three dimensional object", null);
-		this.map.put("?software, multimedia", null);
-		this.map.put("?mixed material", null);
+		
+		this.map.put("?Monographic", "Monograph");
+		this.map.put("?continuing", "Periodical"); // not mapped
+		this.map.put("?Notated music", "Monograph");
+		this.map.put("?Manuscript notated music", "Monograph");
+		this.map.put("?Cartographic material", "Monograph");
+		this.map.put("?Manuscript cartographic material", "Monograph");
+		this.map.put("?Projected medium", "Video");
+		this.map.put("?Nonmusical sound recording", "Audio");
+		this.map.put("?Musical sound recording", "Audio");
+		this.map.put("?Two-dimensional nonprojectable graphic", "Monograph");
+		this.map.put("?Computer file", "Monograph");
+		this.map.put("?Kit", "Monograph");
+		this.map.put("?Mixed materials", "Monograph");
+		this.map.put("?Three-dimensional artefact or naturally occurring object", "Monograph");
+		this.map.put("?Manuscript language material", "Archive");
+		
 		
 		{
 			ImportProperty ip = new ImportProperty();
