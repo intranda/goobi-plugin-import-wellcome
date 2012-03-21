@@ -85,18 +85,18 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		this.map.put("?continuing", "Periodical"); // not mapped
 		this.map.put("?Notated music", "Monograph");
 		this.map.put("?Manuscript notated music", "Monograph");
-		this.map.put("?Cartographic material", "Monograph");
-		this.map.put("?Manuscript cartographic material", "Monograph");
+		this.map.put("?Cartographic material", "SingleMap");
+		this.map.put("?Manuscript cartographic material", "SingleMap");
 		this.map.put("?Projected medium", "Video");
 		this.map.put("?Nonmusical sound recording", "Audio");
 		this.map.put("?Musical sound recording", "Audio");
-		this.map.put("?Two-dimensional nonprojectable graphic", "Monograph");
+		this.map.put("?Two-dimensional nonprojectable graphic", "Artwork");
 		this.map.put("?Computer file", "Monograph");
 		this.map.put("?Kit", "Monograph");
 		this.map.put("?Mixed materials", "Monograph");
-		this.map.put("?Three-dimensional artefact or naturally occurring object", "Monograph");
+		this.map.put("?Three-dimensional artefact or naturally occurring object", "3DObject");
 		this.map.put("?Manuscript language material", "Archive");
-		
+		this.map.put("?BoundManuscript", "BoundManuscript");
 		
 		{
 			ImportProperty ip = new ImportProperty();
