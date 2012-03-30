@@ -27,7 +27,7 @@ import ugh.exceptions.DocStructHasNoTypeException;
 import ugh.exceptions.MetadataTypeNotAllowedException;
 
 public class WellcomeUtils {
-	
+
 	private static final Logger logger = Logger.getLogger(WellcomeUtils.class);
 	private static final Namespace NS_MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
 
@@ -40,13 +40,12 @@ public class WellcomeUtils {
 		}
 		return keyList;
 	}
-	
-	
+
 	public static String getValue(XMLConfiguration config, String inField) {
 		int count = config.getMaxIndex("mapping");
 		for (int i = 0; i <= count; i++) {
 			String field = config.getString("mapping(" + i + ")[@field]");
-			if (field.equals(inField)){
+			if (field.equals(inField)) {
 				return config.getString("mapping(" + i + ")[@value]");
 			}
 		}
@@ -66,7 +65,7 @@ public class WellcomeUtils {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Returns the document's identifier, or a timestamp if the record has none
 	 * 
@@ -77,22 +76,14 @@ public class WellcomeUtils {
 	 * @throws DocStructHasNoTypeException
 	 */
 	public static String getIdentifier(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
-		String ret = null;
-
-		MetadataType mdTypeId = prefs.getMetadataTypeByName("CatalogIDDigital");
-		if (ds.getAllMetadataByType(mdTypeId) != null && !ds.getAllMetadataByType(mdTypeId).isEmpty()) {
-			Metadata mdId = ds.getAllMetadataByType(mdTypeId).get(0);
-			ret = mdId.getValue();
-		} else {
-			Metadata mdId = new Metadata(mdTypeId);
-			ds.addMetadata(mdId);
-			mdId.setValue(String.valueOf(System.currentTimeMillis()));
-			ret = mdId.getValue();
+		String answer = getMetadataValue(prefs, ds, "CatalogIDDigital");
+		if (answer==null){
+			answer = String.valueOf(System.currentTimeMillis());
+			addMetadataValue(prefs, ds, "CatalogIDDigital", answer);
 		}
-
-		return ret;
+		return answer;
 	}
-	
+
 	/**
 	 * Returns the document's wellcome identifier
 	 * 
@@ -103,22 +94,50 @@ public class WellcomeUtils {
 	 * @throws DocStructHasNoTypeException
 	 */
 	public static String getWellcomeIdentifier(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
-		String ret = null;
+		return getMetadataValue(prefs, ds, "wellcomeidentifier");
+	}
 
-		MetadataType mdTypeId = prefs.getMetadataTypeByName("wellcomeidentifier");
+	/**
+	 * Returns the document's leader 6 value
+	 * 
+	 * @param prefs
+	 * @param ds
+	 * @return
+	 * @throws MetadataTypeNotAllowedException
+	 * @throws DocStructHasNoTypeException
+	 */
+	public static String getLeader6(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
+		return getMetadataValue(prefs, ds, "leader6");
+	}
+
+	/**
+	 * Returns given value
+	 * 
+	 * @param prefs
+	 * @param ds
+	 * @return
+	 * @throws MetadataTypeNotAllowedException
+	 * @throws DocStructHasNoTypeException
+	 */
+	private static String getMetadataValue(Prefs prefs, DocStruct ds, String metadataType) throws MetadataTypeNotAllowedException,
+			DocStructHasNoTypeException {
+		String ret = null;
+		MetadataType mdTypeId = prefs.getMetadataTypeByName(metadataType);
 		if (ds.getAllMetadataByType(mdTypeId) != null && !ds.getAllMetadataByType(mdTypeId).isEmpty()) {
 			Metadata mdId = ds.getAllMetadataByType(mdTypeId).get(0);
-			ret = mdId.getValue();
-		} else {
-			Metadata mdId = new Metadata(mdTypeId);
-			ds.addMetadata(mdId);
-			mdId.setValue(String.valueOf(System.currentTimeMillis()));
 			ret = mdId.getValue();
 		}
 		return ret;
 	}
-	
-	
+
+	private static void addMetadataValue(Prefs prefs, DocStruct ds, String metadataType, String value) throws MetadataTypeNotAllowedException,
+			DocStructHasNoTypeException {
+		MetadataType mdTypeId = prefs.getMetadataTypeByName(metadataType);
+		Metadata mdId = new Metadata(mdTypeId);
+		ds.addMetadata(mdId);
+		mdId.setValue(value);
+	}
+
 	/**
 	 * Returns the document's title.
 	 * 
@@ -129,15 +148,7 @@ public class WellcomeUtils {
 	 * @throws DocStructHasNoTypeException
 	 */
 	public static String getTitle(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
-		String ret = null;
-
-		MetadataType mdTypeTitle = prefs.getMetadataTypeByName("TitleDocMain");
-		if (ds.getAllMetadataByType(mdTypeTitle) != null && !ds.getAllMetadataByType(mdTypeTitle).isEmpty()) {
-			Metadata mdTitle = ds.getAllMetadataByType(mdTypeTitle).get(0);
-			ret = mdTitle.getValue();
-		}
-
-		return ret;
+		return getMetadataValue(prefs, ds, "TitleDocMain");
 	}
 
 	/**
@@ -163,9 +174,6 @@ public class WellcomeUtils {
 
 		return ret;
 	}
-	
-	
-	
 
 	/**
 	 * 
@@ -253,9 +261,9 @@ public class WellcomeUtils {
 							if (eleValueList != null) {
 								for (Element eleValue : eleValueList) {
 									List<String> values = new ArrayList<String>();
-//									logger.debug("value: " + eleValue.getTextTrim());
-//									System.out.println("value: " + eleValue.getTextTrim());
-									
+									// logger.debug("value: " + eleValue.getTextTrim());
+									// System.out.println("value: " + eleValue.getTextTrim());
+
 									values.add(eleValue.getTextTrim());
 
 									String value = "";
@@ -291,16 +299,13 @@ public class WellcomeUtils {
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) {
-//		WellcomeCalmImport wic = new WellcomeCalmImport();
-//		List<String> keyList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(wic));
-//		for (String key : keyList) {
-//			System.out.println(key + ": " + WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(wic), key));
-//		}
-		
-		
-		
-		
+		// WellcomeCalmImport wic = new WellcomeCalmImport();
+		// List<String> keyList = WellcomeUtils.getKeys(ConfigPlugins.getPluginConfig(wic));
+		// for (String key : keyList) {
+		// System.out.println(key + ": " + WellcomeUtils.getValue(ConfigPlugins.getPluginConfig(wic), key));
+		// }
+
 	}
 }

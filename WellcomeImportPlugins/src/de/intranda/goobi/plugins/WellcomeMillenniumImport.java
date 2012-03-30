@@ -75,6 +75,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private String currentIdentifier;
 	private String currentTitle;
 	private String currentWellcomeIdentifier;
+	private String currentWellcomeLeader6;
 	private String currentAuthor;
 	private List<String> currentCollectionList;
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
@@ -192,7 +193,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				
 				Document docMods = transformer.transform(doc);
 				 logger.debug(new XMLOutputter().outputString(docMods));
-				 
+								 
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
@@ -228,6 +229,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 				this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
+				this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
 				// Add dummy volume to anchors
 				if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
