@@ -81,7 +81,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
 	public WellcomeMillenniumImport() {
-		
+
 		this.map.put("?Monographic", "Monograph");
 		this.map.put("?continuing", "Periodical"); // not mapped
 		this.map.put("?Notated music", "Monograph");
@@ -98,7 +98,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		this.map.put("?Three-dimensional artefact or naturally occurring object", "3DObject");
 		this.map.put("?Manuscript language material", "Archive");
 		this.map.put("?BoundManuscript", "BoundManuscript");
-		
+
 		{
 			ImportProperty ip = new ImportProperty();
 			ip.setName("CollectionName1");
@@ -134,11 +134,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
-	
+
 	}
 
-	
-	
 	@Override
 	public String getId() {
 		return NAME;
@@ -165,20 +163,20 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		Fileformat ff = null;
 		Document doc;
 		try {
-			//System.out.println(this.data);
-			
+			// System.out.println(this.data);
+
 			doc = new SAXBuilder().build(new StringReader(this.data));
 			if (doc != null && doc.hasRootElement()) {
-				
-				Element record = doc.getRootElement().getChild("record",MARC);
-				List<Element> controlfields = record.getChildren("controlfield",MARC);
-				List<Element> datafields = record.getChildren("datafield",MARC);
+
+				Element record = doc.getRootElement().getChild("record", MARC);
+				List<Element> controlfields = record.getChildren("controlfield", MARC);
+				List<Element> datafields = record.getChildren("datafield", MARC);
 
 				for (Element e : controlfields) {
 					if (e.getAttributeValue("tag").equals("001")) {
 						for (Element e907 : datafields) {
 							if (e907.getAttributeValue("tag").equals("907")) {
-								List<Element> subfields = e907.getChildren("subfield",MARC);
+								List<Element> subfields = e907.getChildren("subfield", MARC);
 								for (Element subfield : subfields) {
 									if (subfield.getAttributeValue("code").equals("a")) {
 										e.setText(subfield.getText().replace(".", ""));
@@ -190,10 +188,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				}
 
 				XSLTransformer transformer = new XSLTransformer(XSLT);
-				
+
 				Document docMods = transformer.transform(doc);
-				 logger.debug(new XMLOutputter().outputString(docMods));
-								 
+				logger.debug(new XMLOutputter().outputString(docMods));
+
 				ff = new MetsMods(this.prefs);
 				DigitalDocument dd = new DigitalDocument();
 				ff.setDigitalDocument(dd);
@@ -268,18 +266,18 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				Metadata dateDigitization = new Metadata(this.prefs.getMetadataTypeByName("_dateDigitization"));
 				dateDigitization.setValue("2012");
 				Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
-				placeOfElectronicOrigin.setValue("Wellcome Trust");		
+				placeOfElectronicOrigin.setValue("Wellcome Trust");
 				Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
-				_electronicEdition.setValue("[Electronic ed.]");				
+				_electronicEdition.setValue("[Electronic ed.]");
 				Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
-				_electronicPublisher.setValue("Wellcome Trust");				
+				_electronicPublisher.setValue("Wellcome Trust");
 				Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-				_digitalOrigin.setValue("reformatted digital");				
+				_digitalOrigin.setValue("reformatted digital");
 				if (dsRoot.getType().isAnchor()) {
 					DocStruct ds = dsRoot.getAllChildren().get(0);
 					ds.addMetadata(dateDigitization);
 					ds.addMetadata(_electronicEdition);
-					
+
 				} else {
 					dsRoot.addMetadata(dateDigitization);
 					dsRoot.addMetadata(_electronicEdition);
@@ -289,10 +287,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				dsRoot.addMetadata(_digitalOrigin);
 
 				Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-				physicalLocation.setValue("Wellcome Trust");	
+				physicalLocation.setValue("Wellcome Trust");
 				dsBoundBook.addMetadata(physicalLocation);
-				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle()+ "_src",
-						getProcessTitle()+ "_mrc.xml", doc);
+				WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_mrc.xml", doc);
 			}
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
@@ -334,7 +331,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			pe.setWert(ip.getValue());
 			io.getProcessProperties().add(pe);
 		}
-		
+
 		{
 			Prozesseigenschaft pe = new Prozesseigenschaft();
 			pe.setTitel("importPlugin");
@@ -350,7 +347,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			io.getProcessProperties().add(pe);
 		}
 	}
-	
+
 	@Override
 	public List<ImportObject> generateFiles(List<Record> records) {
 		List<ImportObject> answer = new ArrayList<ImportObject>();
@@ -365,7 +362,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			} catch (ImportPluginException e1) {
 				io.setErrorMessage(e1.getMessage());
 			}
-			
+
 			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
 			if (ff != null) {
@@ -378,21 +375,21 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					mm.write(fileName);
 					io.setMetsFilename(fileName);
 					io.setImportReturnValue(ImportReturnValue.ExportFinished);
-//					ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
+					// ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
 				} catch (PreferencesException e) {
 					logger.error(e.getMessage(), e);
 					io.setErrorMessage(e.getMessage());
 					io.setImportReturnValue(ImportReturnValue.InvalidData);
-//					ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+					// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 				} catch (WriteException e) {
 					logger.error(e.getMessage(), e);
 					io.setImportReturnValue(ImportReturnValue.WriteError);
 					io.setErrorMessage(e.getMessage());
-//					ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+					// ret.put(getProcessTitle(), ImportReturnValue.WriteError);
 				}
 			} else {
 				io.setImportReturnValue(ImportReturnValue.InvalidData);
-//				ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+				// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
 			}
 			answer.add(io);
 		}
@@ -409,7 +406,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			if (doc != null && doc.getRootElement() != null) {
 				Record record = new Record();
 				record.setData(new XMLOutputter().outputString(doc));
-//				record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
+				// record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
 				ret.add(record);
 
 			} else {
@@ -477,14 +474,16 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getProcessTitle() {
-//		if (StringUtils.isNotBlank(this.currentTitle)) {
-//			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
-//		}
-		String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
-		if (StringUtils.isNotBlank(temp)) {
-			return temp.toLowerCase() + "_" + this.currentIdentifier ;
+		// if (StringUtils.isNotBlank(this.currentTitle)) {
+		// return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+		// }
+		if (this.currentWellcomeIdentifier != null) {
+			String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
+			if (StringUtils.isNotBlank(temp)) {
+				return temp.toLowerCase() + "_" + this.currentIdentifier;
+			}
 		}
-		return this.currentIdentifier ;
+		return this.currentIdentifier;
 	}
 
 	@Override
@@ -582,7 +581,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 		return null;
 	}
-	
+
 	@Override
 	public List<ImportProperty> getProperties() {
 		return this.properties;
@@ -650,8 +649,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		wci.setPrefs(prefs);
 		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/rulesetwellcome.xml");
 		List<Record> recordList = new ArrayList<Record>();
-		
-		
+
 		for (File filename : calms) {
 			// File filename = calms[0];
 			wci.setFile(filename);
@@ -671,8 +669,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		}
 
 	}
-
-
 
 	@Override
 	public List<String> getAllFilenames() {
@@ -713,12 +709,12 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		}
 		return records;
 	}
-	
+
 	@Override
 	public void deleteFiles(List<String> selectedFilenames) {
 		String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
 		for (String filename : selectedFilenames) {
-			File f = new File (folder, filename);
+			File f = new File(folder, filename);
 			FileUtils.deleteQuietly(f);
 		}
 	}
