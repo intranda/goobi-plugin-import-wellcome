@@ -171,20 +171,31 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				Element record = doc.getRootElement().getChild("record", MARC);
 				List<Element> controlfields = record.getChildren("controlfield", MARC);
 				List<Element> datafields = record.getChildren("datafield", MARC);
-
-				for (Element e : controlfields) {
-					if (e.getAttributeValue("tag").equals("001")) {
-						for (Element e907 : datafields) {
-							if (e907.getAttributeValue("tag").equals("907")) {
-								List<Element> subfields = e907.getChildren("subfield", MARC);
-								for (Element subfield : subfields) {
-									if (subfield.getAttributeValue("code").equals("a")) {
-										e.setText(subfield.getText().replace(".", ""));
-									}
-								}
+				String value907a = "";
+				
+				for (Element e907 : datafields) {
+					if (e907.getAttributeValue("tag").equals("907")) {
+						List<Element> subfields = e907.getChildren("subfield", MARC);
+						for (Element subfield : subfields) {
+							if (subfield.getAttributeValue("code").equals("a")) {
+								value907a= subfield.getText().replace(".", "");
 							}
 						}
 					}
+				}
+				boolean control001 = false;
+				for (Element e : controlfields) {
+					if (e.getAttributeValue("tag").equals("001")) {
+						e.setText(value907a);
+						control001 = true;
+						break;
+					}
+				}
+				if (!control001) {
+					Element controlfield001 = new Element("controlfield", MARC);
+					controlfield001.setAttribute("tag", "001");
+					controlfield001.setText(value907a);
+					record.addContent(controlfield001);
 				}
 
 				XSLTransformer transformer = new XSLTransformer(XSLT);
@@ -647,14 +658,14 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
 		wci.setPrefs(prefs);
-		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/rulesetwellcome.xml");
+		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
 		List<Record> recordList = new ArrayList<Record>();
-
-		for (File filename : calms) {
+		File filename = new File("/home/robert/b16756654.xml");
+//		for (File filename : calms) {
 			// File filename = calms[0];
 			wci.setFile(filename);
 			recordList.addAll(wci.generateRecordsFromFile());
-		}
+//		}
 		// Record r = recordList.get(0);
 		for (Record r : recordList) {
 			wci.data = r.getData();
