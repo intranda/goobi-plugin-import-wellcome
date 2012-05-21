@@ -95,8 +95,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 			ip.setName("securityTag");
 			ip.setType(Type.LIST);
 			List<String> values = new ArrayList<String>();
-			values.add("Open");
-			values.add("Closed");
+			values.add("open");
+			values.add("closed");
 			ip.setPossibleValues(values);
 			this.properties.add(ip);
 		}
