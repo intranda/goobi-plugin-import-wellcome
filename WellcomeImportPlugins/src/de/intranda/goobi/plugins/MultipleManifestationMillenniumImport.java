@@ -38,6 +38,7 @@ import org.jdom.transform.XSLTransformer;
 
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
+import ugh.dl.DocStructType;
 import ugh.dl.Fileformat;
 import ugh.dl.Metadata;
 import ugh.dl.MetadataType;
@@ -57,12 +58,12 @@ import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 
 @PluginImplementation
-public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
+public class MultipleManifestationMillenniumImport implements IImportPlugin, IPlugin {
 
 	/** Logger for this class. */
-	private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
+	private static final Logger logger = Logger.getLogger(MultipleManifestationMillenniumImport.class);
 
-	private static final String NAME = "Millennium Import";
+	private static final String NAME = "Multiple Manifestation Millennium Import";
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
@@ -80,8 +81,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 	private String currentAuthor;
 	private List<String> currentCollectionList;
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
+	private List<DocstructElement> currentDocStructs = new ArrayList<DocstructElement>();
+	private DocstructElement docstruct;
 
-	public WellcomeMillenniumImport() {
+	public MultipleManifestationMillenniumImport() {
 
 		this.map.put("?Monographic", "Monograph");
 		this.map.put("?continuing", "Periodical"); // not mapped
@@ -136,6 +139,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 			this.properties.add(ip);
 		}
 
+	
+		
 	}
 
 	@Override
@@ -213,6 +218,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 					eleMods = eleMods.getChild("mods", null);
 				}
 
+				// TODO ab hier für jedes currentDocStructs ein Multi anlegen
+				
 				// Determine the root docstruct type
 				String dsType = "Monograph";
 				if (eleMods.getChild("originInfo", null) != null) {
@@ -655,7 +662,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		// }
 
 		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
-		WellcomeMillenniumImport wci = new WellcomeMillenniumImport();
+		MultipleManifestationMillenniumImport wci = new MultipleManifestationMillenniumImport();
 		Prefs prefs = new Prefs();
 		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
 		wci.setPrefs(prefs);
@@ -733,38 +740,49 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String addDocstruct() {
-		// TODO Auto-generated method stub
+		int order = 1;
+		if (!currentDocStructs.isEmpty()) {
+			order = currentDocStructs.get(currentDocStructs.size()-1).getOrder() +1;
+		}
+		DocstructElement dse = new DocstructElement("Monograph", order);
+		currentDocStructs.add(dse);
+		
 		return "";
 	}
 	
 	@Override
 	public String deleteDocstruct() {
-		// TODO Auto-generated method stub
+		if (currentDocStructs.contains(docstruct)) {
+			currentDocStructs.remove(docstruct);
+		}
 		return "";
 	}
 	
 	@Override
 	public List<DocstructElement> getCurrentDocStructs() {
-		// TODO Auto-generated method stub
-		return null;
+		if (currentDocStructs.size() == 0) {
+			DocstructElement dse = new DocstructElement("Monograph", 1);
+			currentDocStructs.add(dse);
+		}
+		return currentDocStructs;
 	}
 	
-	@Override
+	
 	public List<String> getPossibleDocstructs() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> dsl = new ArrayList<String>();
+		dsl.add("AudioManifestation");
+		dsl.add("BookManifestation");
+		dsl.add("VideoManifestation");
+		return dsl;
 	}
 
-	@Override
+	
 	public DocstructElement getDocstruct() {
-		// TODO Auto-generated method stub
-		return null;
+		return docstruct;
 	}
-
-	@Override
+	
 	public void setDocstruct(DocstructElement dse) {
-		// TODO Auto-generated method stub
-		
+		docstruct = dse;
 	}
-
+	
 }
