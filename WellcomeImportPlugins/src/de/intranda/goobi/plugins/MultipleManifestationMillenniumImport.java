@@ -220,8 +220,16 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
 				this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
+				String strId = String.valueOf(docstruct.getOrder());
+				if (docstruct.getOrder() < 10) {
+					strId = "000" + strId;
+				} else if (docstruct.getOrder() < 100) {
+					strId = "00" + strId;
+				} else if (docstruct.getOrder() < 1000) {
+					strId = "0" + strId;
+				}
 				Metadata mdId = new Metadata(this.prefs.getMetadataTypeByName("CatalogIDDigital"));
-				mdId.setValue(this.currentIdentifier + "_" + docstruct.getOrder());
+				mdId.setValue(this.currentIdentifier + "_" + strId);
 				dsVolume.addMetadata(mdId);
 				Metadata currentNo = new Metadata(this.prefs.getMetadataTypeByName("CurrentNo"));
 				currentNo.setValue(String.valueOf(docstruct.getOrder()));
