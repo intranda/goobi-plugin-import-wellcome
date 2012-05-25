@@ -470,17 +470,22 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
 	@Override
 	public String getProcessTitle() {
-		// if (StringUtils.isNotBlank(this.currentTitle)) {
-		// return new ImportOpac().createAtstsl(this.currentTitle,
-		// this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
-		// }
+
+		String strId = String.valueOf(docstruct.getOrder());
+		if (docstruct.getOrder() < 10) {
+			strId = "000" + strId;
+		} else if (docstruct.getOrder() < 100) {
+			strId = "00" + strId;
+		} else if (docstruct.getOrder() < 1000) {
+			strId = "0" + strId;
+		}
 		if (this.currentWellcomeIdentifier != null) {
 			String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
 			if (StringUtils.isNotBlank(temp)) {
-				return temp.toLowerCase() + "_" + this.currentIdentifier + "_" + docstruct.getOrder();
+				return temp.toLowerCase() + "_" + this.currentIdentifier + "_" + strId;
 			}
 		}
-		return this.currentIdentifier;
+		return this.currentIdentifier+ "_" + strId;
 	}
 
 	@Override
