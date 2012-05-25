@@ -66,14 +66,13 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private static final String NAME = "Multiple Manifestation Millennium Import";
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
-	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map.xml";
+	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map_multi.xml";
 	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
 	private Prefs prefs;
 	private String data = "";
 	private File importFile = null;
 	private String importFolder = "C:/Goobi/";
-	private Map<String, String> map = new HashMap<String, String>();
 	private String currentIdentifier;
 	private String currentTitle;
 	private String currentWellcomeIdentifier;
@@ -85,23 +84,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private DocstructElement docstruct;
 
 	public MultipleManifestationMillenniumImport() {
-
-		this.map.put("?Monographic", "Monograph");
-		this.map.put("?continuing", "Periodical"); // not mapped
-		this.map.put("?Notated music", "Monograph");
-		this.map.put("?Manuscript notated music", "Monograph");
-		this.map.put("?Cartographic material", "SingleMap");
-		this.map.put("?Manuscript cartographic material", "SingleMap");
-		this.map.put("?Projected medium", "Video");
-		this.map.put("?Nonmusical sound recording", "Audio");
-		this.map.put("?Musical sound recording", "Audio");
-		this.map.put("?Two-dimensional nonprojectable graphic", "Artwork");
-		this.map.put("?Computer file", "Monograph");
-		this.map.put("?Kit", "Monograph");
-		this.map.put("?Mixed materials", "Monograph");
-		this.map.put("?Three-dimensional artefact or naturally occurring object", "3DObject");
-		this.map.put("?Manuscript language material", "Archive");
-		this.map.put("?BoundManuscript", "BoundManuscript");
 
 		{
 			ImportProperty ip = new ImportProperty();
@@ -139,8 +121,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			this.properties.add(ip);
 		}
 
-	
-		
 	}
 
 	@Override
@@ -178,13 +158,13 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				List<Element> controlfields = record.getChildren("controlfield", MARC);
 				List<Element> datafields = record.getChildren("datafield", MARC);
 				String value907a = "";
-				
+
 				for (Element e907 : datafields) {
 					if (e907.getAttributeValue("tag").equals("907")) {
 						List<Element> subfields = e907.getChildren("subfield", MARC);
 						for (Element subfield : subfields) {
 							if (subfield.getAttributeValue("code").equals("a")) {
-								value907a= subfield.getText().replace(".", "");
+								value907a = subfield.getText().replace(".", "");
 							}
 						}
 					}
@@ -219,19 +199,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				}
 
 				// TODO ab hier für jedes currentDocStructs ein Multi anlegen
-				
 				// Determine the root docstruct type
-				String dsType = "Monograph";
-				if (eleMods.getChild("originInfo", null) != null) {
-					Element eleIssuance = eleMods.getChild("originInfo", null).getChild("issuance", null);
-					if (eleIssuance != null && this.map.get("?" + eleIssuance.getTextTrim()) != null) {
-						dsType = this.map.get("?" + eleIssuance.getTextTrim());
-					}
-				}
-				Element eleTypeOfResource = eleMods.getChild("typeOfResource", null);
-				if (eleTypeOfResource != null && this.map.get("?" + eleTypeOfResource.getTextTrim()) != null) {
-					dsType = this.map.get("?" + eleTypeOfResource.getTextTrim());
-				}
+				String dsType = "MultipleManifestation";
+
 				logger.debug("Docstruct type: " + dsType);
 
 				DocStruct dsRoot = dd.createDocStruct(this.prefs.getDocStrctTypeByName(dsType));
@@ -239,28 +209,26 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
 				DocStruct dsBoundBook = dd.createDocStruct(this.prefs.getDocStrctTypeByName("BoundBook"));
 				dd.setPhysicalDocStruct(dsBoundBook);
+				DocStruct dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName(docstruct.getDocStruct()));
+				dsRoot.addChild(dsVolume);
 
 				// Collect MODS metadata
-				WellcomeUtils.parseModsSection(MODS_MAPPING_FILE, this.prefs, dsRoot, dsBoundBook, eleMods);
+				WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
 				this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 				this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
 				this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
-				// Add dummy volume to anchors
-				if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
-					DocStruct dsVolume = null;
-					if (dsRoot.getType().getName().equals("Periodical")) {
-						dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("PeriodicalVolume"));
-					} else if (dsRoot.getType().getName().equals("MultiVolumeWork")) {
-						dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("Volume"));
-					}
-					dsRoot.addChild(dsVolume);
-					Metadata mdId = new Metadata(this.prefs.getMetadataTypeByName("CatalogIDDigital"));
-					mdId.setValue(this.currentIdentifier + "_0001");
-					dsVolume.addMetadata(mdId);
-				}
+				Metadata mdId = new Metadata(this.prefs.getMetadataTypeByName("CatalogIDDigital"));
+				mdId.setValue(this.currentIdentifier + "_" + docstruct.getOrder());
+				dsVolume.addMetadata(mdId);
+				Metadata currentNo = new Metadata(this.prefs.getMetadataTypeByName("CurrentNo"));
+				currentNo.setValue(String.valueOf(docstruct.getOrder()));
+				dsVolume.addMetadata(currentNo);
+				Metadata CurrentNoSorting = new Metadata(this.prefs.getMetadataTypeByName("CurrentNoSorting"));
+				CurrentNoSorting.setValue(String.valueOf(docstruct.getOrder()));
+				dsVolume.addMetadata(CurrentNoSorting);
 
 				// Add 'pathimagefiles'
 				try {
@@ -332,6 +300,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			logger.error(e.getMessage(), e);
 			throw new ImportPluginException(e);
 		}
+
 		return ff;
 	}
 
@@ -371,48 +340,55 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	public List<ImportObject> generateFiles(List<Record> records) {
 		List<ImportObject> answer = new ArrayList<ImportObject>();
 
-		for (Record r : records) {
+		if (records.size() > 0) {
+			Record r = records.get(0);
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
-			ImportObject io = new ImportObject();
-			Fileformat ff = null;
-			try {
-				ff = convertData();
-			} catch (ImportPluginException e1) {
-				io.setErrorMessage(e1.getMessage());
-			}
-
-			generateProperties(io);
-			io.setProcessTitle(getProcessTitle());
-			if (ff != null) {
-				r.setId(this.currentIdentifier);
+			for (DocstructElement dse : currentDocStructs) {
+				docstruct = dse;
+				ImportObject io = new ImportObject();
+				Fileformat ff = null;
 				try {
-					MetsMods mm = new MetsMods(this.prefs);
-					mm.setDigitalDocument(ff.getDigitalDocument());
-					String fileName = getImportFolder() + getProcessTitle() + ".xml";
-					logger.debug("Writing '" + fileName + "' into given folder...");
-					mm.write(fileName);
-					io.setMetsFilename(fileName);
-					io.setImportReturnValue(ImportReturnValue.ExportFinished);
-					// ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
-				} catch (PreferencesException e) {
-					logger.error(e.getMessage(), e);
-					io.setErrorMessage(e.getMessage());
-					io.setImportReturnValue(ImportReturnValue.InvalidData);
-					// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
-				} catch (WriteException e) {
-					logger.error(e.getMessage(), e);
-					io.setImportReturnValue(ImportReturnValue.WriteError);
-					io.setErrorMessage(e.getMessage());
-					// ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+					ff = convertData();
+				} catch (ImportPluginException e1) {
+					io.setErrorMessage(e1.getMessage());
 				}
-			} else {
-				io.setImportReturnValue(ImportReturnValue.InvalidData);
-				// ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
-			}
-			answer.add(io);
-		}
 
+				generateProperties(io);
+				io.setProcessTitle(getProcessTitle());
+				if (ff != null) {
+					r.setId(this.currentIdentifier);
+					try {
+						MetsMods mm = new MetsMods(this.prefs);
+						mm.setDigitalDocument(ff.getDigitalDocument());
+						String fileName = getImportFolder() + getProcessTitle() + ".xml";
+						logger.debug("Writing '" + fileName + "' into given folder...");
+						mm.write(fileName);
+						io.setMetsFilename(fileName);
+						io.setImportReturnValue(ImportReturnValue.ExportFinished);
+						// ret.put(getProcessTitle(),
+						// ImportReturnValue.ExportFinished);
+					} catch (PreferencesException e) {
+						logger.error(e.getMessage(), e);
+						io.setErrorMessage(e.getMessage());
+						io.setImportReturnValue(ImportReturnValue.InvalidData);
+						// ret.put(getProcessTitle(),
+						// ImportReturnValue.InvalidData);
+					} catch (WriteException e) {
+						logger.error(e.getMessage(), e);
+						io.setImportReturnValue(ImportReturnValue.WriteError);
+						io.setErrorMessage(e.getMessage());
+						// ret.put(getProcessTitle(),
+						// ImportReturnValue.WriteError);
+					}
+				} else {
+					io.setImportReturnValue(ImportReturnValue.InvalidData);
+					// ret.put(getProcessTitle(),
+					// ImportReturnValue.InvalidData);
+				}
+				answer.add(io);
+			}
+		}
 		return answer;
 	}
 
@@ -425,7 +401,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			if (doc != null && doc.getRootElement() != null) {
 				Record record = new Record();
 				record.setData(new XMLOutputter().outputString(doc));
-				// record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
+				// record.setData(new
+				// XMLOutputter().outputString(doc).replace("marc:", ""));
 				ret.add(record);
 
 			} else {
@@ -494,12 +471,13 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	@Override
 	public String getProcessTitle() {
 		// if (StringUtils.isNotBlank(this.currentTitle)) {
-		// return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
+		// return new ImportOpac().createAtstsl(this.currentTitle,
+		// this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
 		// }
 		if (this.currentWellcomeIdentifier != null) {
 			String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
 			if (StringUtils.isNotBlank(temp)) {
-				return temp.toLowerCase() + "_" + this.currentIdentifier;
+				return temp.toLowerCase() + "_" + this.currentIdentifier + "_" + docstruct.getOrder();
 			}
 		}
 		return this.currentIdentifier;
@@ -607,59 +585,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	}
 
 	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
-		// CamMarcImport converter = new CamMarcImport();
-		// converter.prefs = new Prefs();
-		// try {
-		// converter.prefs.loadPrefs("resources/gdz.xml");
-		// } catch (PreferencesException e) {
-		// logger.error(e.getMessage(), e);
-		// }
-		//
-		// converter.setFile(new File("samples/marc21-cam/monographs.mrc"));
-		// converter.setImportFolder("C:/Goobi/hotfolder/");
-		// List<Record> records = converter.generateRecordsFromFile();
-		//
-		// // converter.importFile = new File("samples/marc21-cam/music.txt");
-		// // StringBuilder sb = new StringBuilder();
-		// // BufferedReader inputStream = null;
-		// // try {
-		// // inputStream = new BufferedReader(new
-		// FileReader(converter.importFile));
-		// // String l;
-		// // while ((l = inputStream.readLine()) != null) {
-		// // sb.append(l + "\n");
-		// // }
-		// // } catch (IOException e) {
-		// // logger.error(e.getMessage(), e);
-		// // } finally {
-		// // if (inputStream != null) {
-		// // try {
-		// // inputStream.close();
-		// // } catch (IOException e) {
-		// // logger.error(e.getMessage(), e);
-		// // }
-		// // }
-		// // }
-		// // List<Record> records = converter.splitRecords(sb.toString());
-		//
-		// int counter = 1;
-		// String[] collections = { "Varia", "DigiWunschbuch" };
-		// for (Record record : records) {
-		// record.setCollections(Arrays.asList(collections));
-		// logger.debug(counter + ":\n" + record.getData());
-		// converter.data = record.getData();
-		// converter.currentCollectionList = record.getCollections();
-		// Fileformat ff = converter.convertData();
-		// try {
-		// ff.write("c:/" + converter.importFile.getName().replace(".mrc", "") +
-		// "_" + counter + ".xml");
-		// } catch (WriteException e) {
-		// e.printStackTrace();
-		// } catch (PreferencesException e) {
-		// e.printStackTrace();
-		// }
-		// counter++;
-		// }
 
 		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
 		MultipleManifestationMillenniumImport wci = new MultipleManifestationMillenniumImport();
@@ -669,11 +594,11 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
 		List<Record> recordList = new ArrayList<Record>();
 		File filename = new File("/home/robert/b16756654.xml");
-//		for (File filename : calms) {
-			// File filename = calms[0];
-			wci.setFile(filename);
-			recordList.addAll(wci.generateRecordsFromFile());
-//		}
+		// for (File filename : calms) {
+		// File filename = calms[0];
+		wci.setFile(filename);
+		recordList.addAll(wci.generateRecordsFromFile());
+		// }
 		// Record r = recordList.get(0);
 		for (Record r : recordList) {
 			wci.data = r.getData();
@@ -742,14 +667,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	public String addDocstruct() {
 		int order = 1;
 		if (!currentDocStructs.isEmpty()) {
-			order = currentDocStructs.get(currentDocStructs.size()-1).getOrder() +1;
+			order = currentDocStructs.get(currentDocStructs.size() - 1).getOrder() + 1;
 		}
 		DocstructElement dse = new DocstructElement("Monograph", order);
 		currentDocStructs.add(dse);
-		
+
 		return "";
 	}
-	
+
 	@Override
 	public String deleteDocstruct() {
 		if (currentDocStructs.contains(docstruct)) {
@@ -757,7 +682,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		}
 		return "";
 	}
-	
+
 	@Override
 	public List<DocstructElement> getCurrentDocStructs() {
 		if (currentDocStructs.size() == 0) {
@@ -766,8 +691,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		}
 		return currentDocStructs;
 	}
-	
-	
+
 	public List<String> getPossibleDocstructs() {
 		List<String> dsl = new ArrayList<String>();
 		dsl.add("AudioManifestation");
@@ -776,13 +700,12 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		return dsl;
 	}
 
-	
 	public DocstructElement getDocstruct() {
 		return docstruct;
 	}
-	
+
 	public void setDocstruct(DocstructElement dse) {
 		docstruct = dse;
 	}
-	
+
 }
