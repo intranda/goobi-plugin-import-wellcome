@@ -242,7 +242,8 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
 				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 			}
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_WellcomeImages", doc);
+			File folderForImport = new File (getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
+			WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_WellcomeImages", doc);
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 			ff = null;

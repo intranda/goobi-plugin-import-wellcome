@@ -261,8 +261,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 				dsBoundBook.addMetadata(physicalLocation);
 				
 			}
-
-			WellcomeUtils.writeXmlToFile(getImportFolder() + File.separator + getProcessTitle() + "_src", getProcessTitle() + "_CALM.xml", doc);
+			File folderForImport = new File (getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
+			WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_CALM.xml", doc);
 		} catch (JDOMException e) {
 			logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
 			ff = null;
