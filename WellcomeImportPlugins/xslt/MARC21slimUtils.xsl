@@ -51,7 +51,7 @@
 			<xsl:text> </xsl:text>
 		</xsl:param>
 		<xsl:variable name="str">
-			<xsl:for-each select="subfield">
+			<xsl:for-each select="marc:subfield">
 				<xsl:if test="contains($codes, @code)">
 					<xsl:value-of select="text()"/>
 					<xsl:value-of select="$delimeter"/>
