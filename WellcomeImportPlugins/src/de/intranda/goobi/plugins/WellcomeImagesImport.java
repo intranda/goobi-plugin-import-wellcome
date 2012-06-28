@@ -80,12 +80,14 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			values.add("Digitised");
 			values.add("Born digital");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
 			ImportProperty ip = new ImportProperty();
 			ip.setName("CollectionName2");
 			ip.setType(Type.TEXT);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
@@ -96,6 +98,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			values.add("open");
 			values.add("closed");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
@@ -105,6 +108,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			List<String> values = new ArrayList<String>();
 			values.add("MIRO");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 	}

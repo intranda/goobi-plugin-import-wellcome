@@ -93,12 +93,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			values.add("Digitised");
 			values.add("Born digital");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
 			ImportProperty ip = new ImportProperty();
 			ip.setName("CollectionName2");
 			ip.setType(Type.TEXT);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
@@ -109,6 +111,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			values.add("open");
 			values.add("closed");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 		{
@@ -118,6 +121,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			List<String> values = new ArrayList<String>();
 			values.add("Millennium");
 			ip.setPossibleValues(values);
+			ip.setRequired(true);
 			this.properties.add(ip);
 		}
 
