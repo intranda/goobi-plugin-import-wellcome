@@ -7,9 +7,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +36,6 @@ import org.jdom.transform.XSLTransformer;
 
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
-import ugh.dl.DocStructType;
 import ugh.dl.Fileformat;
 import ugh.dl.Metadata;
 import ugh.dl.MetadataType;
@@ -50,6 +47,7 @@ import ugh.exceptions.TypeNotAllowedAsChildException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
+import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
 import de.sub.goobi.config.ConfigMain;
@@ -74,14 +72,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private File importFile = null;
 	private String importFolder = "C:/Goobi/";
 	private String currentIdentifier;
-	private String currentTitle;
+//	private String currentTitle;
 	private String currentWellcomeIdentifier;
-	private String currentWellcomeLeader6;
-	private String currentAuthor;
+//	private String currentWellcomeLeader6;
+//	private String currentAuthor;
 	private List<String> currentCollectionList;
 	private List<ImportProperty> properties = new ArrayList<ImportProperty>();
-	private List<DocstructElement> currentDocStructs = new ArrayList<DocstructElement>();
-	private DocstructElement docstruct;
+	private List<WellcomeDocstructElement> currentDocStructs = new ArrayList<WellcomeDocstructElement>();
+	private WellcomeDocstructElement docstruct;
 
 	public MultipleManifestationMillenniumImport() {
 
@@ -120,6 +118,21 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			ip.setType(Type.LIST);
 			List<String> values = new ArrayList<String>();
 			values.add("Millennium");
+			ip.setPossibleValues(values);
+			ip.setRequired(true);
+			this.properties.add(ip);
+		}
+
+		{
+			ImportProperty ip = new ImportProperty();
+			ip.setName("Multiple manifestation type");
+			ip.setType(Type.LIST);
+			List<String> values = new ArrayList<String>();
+			values.add("General");
+			values.add("Video & transcript & poster image");
+			values.add("Video & transcript");
+			values.add("Audio & transcript");
+			values.add("Audio & transcript & poster image");
 			ip.setPossibleValues(values);
 			ip.setRequired(true);
 			this.properties.add(ip);
@@ -202,7 +215,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 					eleMods = eleMods.getChild("mods", null);
 				}
 
-				// TODO ab hier für jedes currentDocStructs ein Multi anlegen
 				// Determine the root docstruct type
 				String dsType = "MultipleManifestation";
 
@@ -219,10 +231,10 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				// Collect MODS metadata
 				WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
 				this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
-				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 				this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-				this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
+//				this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
+//				this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+//				this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
 				String strId = String.valueOf(docstruct.getOrder());
 				if (docstruct.getOrder() < 10) {
@@ -241,6 +253,29 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				Metadata CurrentNoSorting = new Metadata(this.prefs.getMetadataTypeByName("CurrentNoSorting"));
 				CurrentNoSorting.setValue(String.valueOf(docstruct.getOrder()));
 				dsVolume.addMetadata(CurrentNoSorting);
+
+				Metadata manifestationType = new Metadata(this.prefs.getMetadataTypeByName("_ManifestationType"));
+				for (ImportProperty ip : this.properties) {
+					if (ip.getName().equals("Multiple manifestation type")) {
+						manifestationType.setValue(ip.getValue());
+						break;
+					}
+				}
+				dsRoot.addMetadata(manifestationType);
+				String copyvalue = docstruct.getCopyProperty().getValue();
+				if (!copyvalue.equals("N/A")) {
+					Metadata copyType = new Metadata(this.prefs.getMetadataTypeByName("_copy"));
+					copyType.setValue(copyvalue);
+					dsVolume.addMetadata(copyType);
+				}
+
+				String volumevalue = docstruct.getVolumeProperty().getValue();
+				if (!volumevalue.equals("N/A")) {
+					Metadata volumeType = new Metadata(this.prefs.getMetadataTypeByName("_volume"));
+					volumeType.setValue(volumevalue);
+					dsVolume.addMetadata(volumeType);
+
+				}
 
 				// Add 'pathimagefiles'
 				try {
@@ -288,7 +323,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
 				physicalLocation.setValue("Wellcome Trust");
 				dsBoundBook.addMetadata(physicalLocation);
-				File folderForImport = new File (getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
+				File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
 				WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
 			}
 		} catch (JDOMException e) {
@@ -319,18 +354,20 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
 	private void generateProperties(ImportObject io) {
 		for (ImportProperty ip : this.properties) {
-			Prozesseigenschaft pe = new Prozesseigenschaft();
-			pe.setTitel(ip.getName());
-			pe.setContainer(ip.getContainer());
-			pe.setCreationDate(new Date());
-			pe.setIstObligatorisch(false);
-			if (ip.getType().equals(Type.LIST)) {
-				pe.setType(PropertyType.List);
-			} else if (ip.getType().equals(Type.TEXT)) {
-				pe.setType(PropertyType.String);
+			if (!ip.getName().equals("Multiple manifestation type")) {
+				Prozesseigenschaft pe = new Prozesseigenschaft();
+				pe.setTitel(ip.getName());
+				pe.setContainer(ip.getContainer());
+				pe.setCreationDate(new Date());
+				pe.setIstObligatorisch(false);
+				if (ip.getType().equals(Type.LIST)) {
+					pe.setType(PropertyType.List);
+				} else if (ip.getType().equals(Type.TEXT)) {
+					pe.setType(PropertyType.String);
+				}
+				pe.setWert(ip.getValue());
+				io.getProcessProperties().add(pe);
 			}
-			pe.setWert(ip.getValue());
-			io.getProcessProperties().add(pe);
 		}
 
 		{
@@ -358,7 +395,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			this.data = r.getData();
 			this.currentCollectionList = r.getCollections();
 			for (DocstructElement dse : currentDocStructs) {
-				docstruct = dse;
+				docstruct = (WellcomeDocstructElement) dse;
 				ImportObject io = new ImportObject();
 				Fileformat ff = null;
 				try {
@@ -498,7 +535,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				return temp.toLowerCase() + "_" + this.currentIdentifier + "_" + strId;
 			}
 		}
-		return this.currentIdentifier+ "_" + strId;
+		return this.currentIdentifier + "_" + strId;
 	}
 
 	@Override
@@ -602,36 +639,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		return this.properties;
 	}
 
-	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
-
-		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
-		MultipleManifestationMillenniumImport wci = new MultipleManifestationMillenniumImport();
-		Prefs prefs = new Prefs();
-		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
-		wci.setPrefs(prefs);
-		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
-		List<Record> recordList = new ArrayList<Record>();
-		File filename = new File("/home/robert/b16756654.xml");
-		// for (File filename : calms) {
-		// File filename = calms[0];
-		wci.setFile(filename);
-		recordList.addAll(wci.generateRecordsFromFile());
-		// }
-		// Record r = recordList.get(0);
-		for (Record r : recordList) {
-			wci.data = r.getData();
-			Fileformat ff = wci.convertData();
-			if (ff != null) {
-				MetsMods mm = new MetsMods(prefs);
-				mm.setDigitalDocument(ff.getDigitalDocument());
-				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-				logger.debug("Writing '" + fileName + "' into given folder...");
-				mm.write(fileName);
-			}
-		}
-
-	}
-
 	@Override
 	public List<String> getAllFilenames() {
 		List<String> answer = new ArrayList<String>();
@@ -683,11 +690,12 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
 	@Override
 	public String addDocstruct() {
+
 		int order = 1;
 		if (!currentDocStructs.isEmpty()) {
 			order = currentDocStructs.get(currentDocStructs.size() - 1).getOrder() + 1;
 		}
-		DocstructElement dse = new DocstructElement("Monograph", order);
+		WellcomeDocstructElement dse = new WellcomeDocstructElement("Monograph", order);
 		currentDocStructs.add(dse);
 
 		return "";
@@ -702,28 +710,72 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	}
 
 	@Override
-	public List<DocstructElement> getCurrentDocStructs() {
+	public List<? extends DocstructElement> getCurrentDocStructs() {
 		if (currentDocStructs.size() == 0) {
-			DocstructElement dse = new DocstructElement("Monograph", 1);
+			WellcomeDocstructElement dse = new WellcomeDocstructElement("Monograph", 1);
 			currentDocStructs.add(dse);
 		}
 		return currentDocStructs;
 	}
 
+	@Override
 	public List<String> getPossibleDocstructs() {
 		List<String> dsl = new ArrayList<String>();
-		dsl.add("AudioManifestation");
-		dsl.add("BookManifestation");
-		dsl.add("VideoManifestation");
+		// TODO Auswahl in Ruleset-DocStructs mappen
+		dsl.add("Archive");
+		dsl.add("Artwork");
+		dsl.add("Audio");
+		dsl.add("Born digital");
+		dsl.add("Bound manuscript");
+		dsl.add("Monograph");
+		dsl.add("Multiple copy");
+		dsl.add("Multiple volume");
+		dsl.add("Multiple volume multiple copy");
+		dsl.add("Poster image");
+		dsl.add("Still images");
+		dsl.add("Transcript");
+		dsl.add("Video");
 		return dsl;
 	}
 
-	public DocstructElement getDocstruct() {
+	@Override
+	public WellcomeDocstructElement getDocstruct() {
 		return docstruct;
 	}
 
+	@Override
 	public void setDocstruct(DocstructElement dse) {
-		docstruct = dse;
+		docstruct = (WellcomeDocstructElement) dse;
 	}
 
+	
+	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
+
+		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
+		MultipleManifestationMillenniumImport wci = new MultipleManifestationMillenniumImport();
+		Prefs prefs = new Prefs();
+		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
+		wci.setPrefs(prefs);
+		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
+		List<Record> recordList = new ArrayList<Record>();
+		File filename = new File("/home/robert/b16756654.xml");
+		// for (File filename : calms) {
+		// File filename = calms[0];
+		wci.setFile(filename);
+		recordList.addAll(wci.generateRecordsFromFile());
+		// }
+		// Record r = recordList.get(0);
+		for (Record r : recordList) {
+			wci.data = r.getData();
+			Fileformat ff = wci.convertData();
+			if (ff != null) {
+				MetsMods mm = new MetsMods(prefs);
+				mm.setDigitalDocument(ff.getDigitalDocument());
+				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
+				logger.debug("Writing '" + fileName + "' into given folder...");
+				mm.write(fileName);
+			}
+		}
+
+	}
 }

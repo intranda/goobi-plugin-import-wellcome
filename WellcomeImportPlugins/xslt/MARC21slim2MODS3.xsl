@@ -291,10 +291,9 @@
 				<xsl:when test="$leader6='t'">
 					Manuscript language material
 				</xsl:when>
-                                <xsl:when test="$leader6=''">
-                                        BoundManuscript
-                                </xsl:when>
-
+				<xsl:otherwise>
+                    BoundManuscript                            
+				</xsl:otherwise>
 			</xsl:choose>
 		</typeOfResource>
 		<note type="leader6">
