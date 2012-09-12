@@ -113,7 +113,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 		}
 	}
 
-	@Override
+	
 	public String getId() {
 		return NAME;
 	}

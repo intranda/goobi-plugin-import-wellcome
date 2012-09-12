@@ -116,7 +116,7 @@
 		<name>CreationProductionCreditsNote</name>
 		<xpath>/mods:mods/mods:note[@type='creation/production credits']</xpath>
 	</metadata>
-		<metadata logical="true">
+	<metadata logical="true">
 		<name>PreferredCitation</name>
 		<xpath>/mods:mods/mods:note[@type='preferred citation']</xpath>
 	</metadata>
@@ -144,8 +144,6 @@
 		<name>recordContentSource</name>
 		<xpath>/mods:mods/mods:recordInfo/mods:recordContentSource</xpath>
 	</metadata>
-<!-- 
- -->
     <metadata logical="true">
 		<name>wellcomeidentifier</name>
 		<xpath>/mods:mods/mods:note[@type='wellcomeidentifier']</xpath>
@@ -162,5 +160,10 @@
 		<metadata physical="true">
 		<name>pieceDesignation</name>
 		<xpath>/mods:mods/mods:location/mods:holdingSimple/mods:copyInformation/mods:pieceDesignation</xpath>
+	</metadata>
+	
+		<metadata logical="true">
+		<name>physicalLocation</name>
+		<xpath>/mods:mods/mods:note[@type='original location']</xpath>
 	</metadata>
 </map>

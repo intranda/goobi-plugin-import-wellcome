@@ -63,7 +63,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private static final Logger logger = Logger.getLogger(MultipleManifestationMillenniumImport.class);
 
 	private static final String NAME = "Multiple Manifestation Millennium Import";
-	private static final String ID = "MultipleManifestationMillenniumImport";
+//	private static final String ID = "MultipleManifestationMillenniumImport";
 	// private static final String VERSION = "0.1";
 	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
 	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map_multi.xml";
@@ -155,9 +155,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
 	}
 
-	@Override
+	
 	public String getId() {
-		return ID;
+		return NAME;
 	}
 
 	@Override

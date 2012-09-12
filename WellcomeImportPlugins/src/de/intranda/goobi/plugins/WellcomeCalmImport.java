@@ -116,7 +116,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 		}
 	}
 
-	@Override
+	
 	public String getId() {
 		return NAME;
 	}
