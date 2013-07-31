@@ -17,9 +17,9 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.goobi.production.Import.DocstructElement;
-import org.goobi.production.Import.ImportObject;
-import org.goobi.production.Import.Record;
+import org.goobi.production.importer.DocstructElement;
+import org.goobi.production.importer.ImportObject;
+import org.goobi.production.importer.Record;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
@@ -50,7 +50,7 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
-import de.sub.goobi.Beans.Prozesseigenschaft;
+import org.goobi.beans.Processproperty;
 import de.sub.goobi.config.ConfigMain;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
@@ -373,7 +373,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private void generateProperties(ImportObject io) {
 		for (ImportProperty ip : this.properties) {
 			if (!ip.getName().equals("Multiple manifestation type")) {
-				Prozesseigenschaft pe = new Prozesseigenschaft();
+			    Processproperty pe = new Processproperty();
 				pe.setTitel(ip.getName());
 				pe.setContainer(ip.getContainer());
 				pe.setCreationDate(new Date());
@@ -389,14 +389,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		}
 
 		{
-			Prozesseigenschaft pe = new Prozesseigenschaft();
+		    Processproperty pe = new Processproperty();
 			pe.setTitel("importPlugin");
 			pe.setWert(getTitle());
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
 		}
 		{
-			Prozesseigenschaft pe = new Prozesseigenschaft();
+		    Processproperty pe = new Processproperty();
 			pe.setTitel("b-number");
 			pe.setWert(this.currentIdentifier);
 			pe.setType(PropertyType.String);
