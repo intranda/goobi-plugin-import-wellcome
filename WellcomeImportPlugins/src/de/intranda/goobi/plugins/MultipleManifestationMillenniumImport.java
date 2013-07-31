@@ -98,6 +98,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		structType.put("Still images", "StillImageManifestation");
 		structType.put("Transcript", "TranscriptManifestation");
 		structType.put("Video", "VideoManifestation");
+		structType.put("Report", "PDFReport");
+		structType.put("Annex", "PDFAnnex");
+
 		{
 			ImportProperty ip = new ImportProperty();
 			ip.setName("CollectionName1");
@@ -399,6 +402,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 			pe.setType(PropertyType.String);
 			io.getProcessProperties().add(pe);
 		}
+		
+//		{
+//			Prozesseigenschaft pe = new Prozesseigenschaft();
+//			pe.setTitel("CatalogueURL");
+//			pe.setWert("http://catalogue.example.com/db/3/?id=" + this.currentIdentifier);
+//			pe.setType(PropertyType.String);
+//			io.getProcessProperties().add(pe);
+//		}
 	}
 
 	@Override
@@ -749,6 +760,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		dsl.add("Still images");
 		dsl.add("Transcript");
 		dsl.add("Video");
+		dsl.add("Report");
+		dsl.add("Annex");
 		return dsl;
 	}
 
