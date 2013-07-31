@@ -14,7 +14,7 @@
 	<property name="pluginFolderUnix" value="/opt/digiverso/goobi/plugins/import/" />
 
 	<path id="classpath">
-	    <fileset dir="/opt/digiverso/goobilibs/lib"/> 
+	    <fileset dir="/opt/digiverso/goobi-jsf2/lib"/> 
 	    <fileset dir="/opt/digiverso/libs" />
 	</path>
 
@@ -131,7 +131,7 @@
 				<attribute name="Main-Class" value="de.intranda.goobi.PluginInfo" />
 				<attribute name="Class-Path" value="${libs.project}" />
 			</manifest>
-		 	<fileset dir="bin" />
+			<fileset dir="bin"/>
 		</jar>
 	</target>
 
