@@ -429,7 +429,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				} catch (ImportPluginException e1) {
 					io.setErrorMessage(e1.getMessage());
 				}
-
+				if (r.getId() != null) {
+				    io.setImportFileName(r.getId());
+				}
 				generateProperties(io);
 				io.setProcessTitle(getProcessTitle());
 				if (ff != null) {
@@ -690,6 +692,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 				Document doc = new SAXBuilder().build(f);
 				if (doc != null && doc.getRootElement() != null) {
 					Record record = new Record();
+					record.setId(filename);
 					record.setData(new XMLOutputter().outputString(doc));
 					records.add(record);
 				} else {

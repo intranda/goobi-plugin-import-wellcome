@@ -390,6 +390,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
 			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
+            if (r.getId() != null) {
+                io.setImportFileName(r.getId());
+            }
 			if (ff != null) {
 				r.setId(this.currentIdentifier);
 				try {
@@ -612,89 +615,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 		return this.properties;
 	}
 
-	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
-		// CamMarcImport converter = new CamMarcImport();
-		// converter.prefs = new Prefs();
-		// try {
-		// converter.prefs.loadPrefs("resources/gdz.xml");
-		// } catch (PreferencesException e) {
-		// logger.error(e.getMessage(), e);
-		// }
-		//
-		// converter.setFile(new File("samples/marc21-cam/monographs.mrc"));
-		// converter.setImportFolder("C:/Goobi/hotfolder/");
-		// List<Record> records = converter.generateRecordsFromFile();
-		//
-		// // converter.importFile = new File("samples/marc21-cam/music.txt");
-		// // StringBuilder sb = new StringBuilder();
-		// // BufferedReader inputStream = null;
-		// // try {
-		// // inputStream = new BufferedReader(new
-		// FileReader(converter.importFile));
-		// // String l;
-		// // while ((l = inputStream.readLine()) != null) {
-		// // sb.append(l + "\n");
-		// // }
-		// // } catch (IOException e) {
-		// // logger.error(e.getMessage(), e);
-		// // } finally {
-		// // if (inputStream != null) {
-		// // try {
-		// // inputStream.close();
-		// // } catch (IOException e) {
-		// // logger.error(e.getMessage(), e);
-		// // }
-		// // }
-		// // }
-		// // List<Record> records = converter.splitRecords(sb.toString());
-		//
-		// int counter = 1;
-		// String[] collections = { "Varia", "DigiWunschbuch" };
-		// for (Record record : records) {
-		// record.setCollections(Arrays.asList(collections));
-		// logger.debug(counter + ":\n" + record.getData());
-		// converter.data = record.getData();
-		// converter.currentCollectionList = record.getCollections();
-		// Fileformat ff = converter.convertData();
-		// try {
-		// ff.write("c:/" + converter.importFile.getName().replace(".mrc", "") +
-		// "_" + counter + ".xml");
-		// } catch (WriteException e) {
-		// e.printStackTrace();
-		// } catch (PreferencesException e) {
-		// e.printStackTrace();
-		// }
-		// counter++;
-		// }
-
-		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
-		WellcomeMillenniumImport wci = new WellcomeMillenniumImport();
-		Prefs prefs = new Prefs();
-		wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
-		wci.setPrefs(prefs);
-		wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
-		List<Record> recordList = new ArrayList<Record>();
-		File filename = new File("/home/robert/b16756654.xml");
-//		for (File filename : calms) {
-			// File filename = calms[0];
-			wci.setFile(filename);
-			recordList.addAll(wci.generateRecordsFromFile());
-//		}
-		// Record r = recordList.get(0);
-		for (Record r : recordList) {
-			wci.data = r.getData();
-			Fileformat ff = wci.convertData();
-			if (ff != null) {
-				MetsMods mm = new MetsMods(prefs);
-				mm.setDigitalDocument(ff.getDigitalDocument());
-				String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-				logger.debug("Writing '" + fileName + "' into given folder...");
-				mm.write(fileName);
-			}
-		}
-
-	}
-
 	@Override
 	public List<String> getAllFilenames() {
 		List<String> answer = new ArrayList<String>();
@@ -720,6 +640,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 				Document doc = new SAXBuilder().build(f);
 				if (doc != null && doc.getRootElement() != null) {
 					Record record = new Record();
+                    record.setId(filename);
 					record.setData(new XMLOutputter().outputString(doc));
 					records.add(record);
 				} else {
