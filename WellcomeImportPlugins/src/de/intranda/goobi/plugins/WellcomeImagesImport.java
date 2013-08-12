@@ -336,6 +336,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 			ImportObject io = new ImportObject();
 			generateProperties(io);
 			io.setProcessTitle(getProcessTitle());
+			if (r.getId() != null) {
+                io.setImportFileName(r.getId());
+            }
 			if (ff != null) {
 				r.setId(this.currentIdentifier);
 				try {
