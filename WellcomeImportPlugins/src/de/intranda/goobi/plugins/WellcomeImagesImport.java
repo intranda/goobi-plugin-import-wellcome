@@ -11,7 +11,6 @@ import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.goobi.production.Import.DocstructElement;
 import org.goobi.production.Import.ImportObject;
@@ -43,7 +42,6 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.Beans.Prozesseigenschaft;
-import de.sub.goobi.Import.ImportOpac;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.enums.PropertyType;
 
@@ -278,9 +276,6 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
 	@Override
 	public String getProcessTitle() {
-		if (StringUtils.isNotBlank(this.currentTitle)) {
-			return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier;
-		}
 		return this.currentIdentifier;
 	}
 

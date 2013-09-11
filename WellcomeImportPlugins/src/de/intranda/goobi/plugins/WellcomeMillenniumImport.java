@@ -381,17 +381,20 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
             this.currentCollectionList = r.getCollections();
             ImportObject io = new ImportObject();
             Fileformat ff = null;
+            if (r.getId() != null) {
+                io.setImportFileName(r.getId());
+            }
             try {
                 ff = convertData();
-            } catch (ImportPluginException e1) {
+            } catch (Exception e1) {
                 io.setErrorMessage(e1.getMessage());
             }
 
             generateProperties(io);
             io.setProcessTitle(getProcessTitle());
-            if (r.getId() != null) {
-                io.setImportFileName(r.getId());
-            }
+           if (io.getProcessTitle() == null) {
+               io.setProcessTitle(io.getImportFileName());
+           }
             if (ff != null) {
                 r.setId(this.currentIdentifier);
                 try {
@@ -647,8 +650,17 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 }
             } catch (JDOMException e) {
                 logger.error(e.getMessage(), e);
+                Record record = new Record();
+                record.setId(filename);
+                record.setData("");
+                records.add(record);
+                
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                Record record = new Record();
+                record.setId(filename);
+                record.setData("");
+                records.add(record);
             }
 
         }
