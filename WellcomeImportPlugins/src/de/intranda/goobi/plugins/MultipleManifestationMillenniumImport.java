@@ -778,6 +778,10 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 		docstruct = (WellcomeDocstructElement) dse;
 	}
 
+	   public void setDocstruct(WellcomeDocstructElement dse) {
+	        docstruct =  dse;
+	    }
+	
 	public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
 
 		File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();

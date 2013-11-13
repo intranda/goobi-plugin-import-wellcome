@@ -9,11 +9,6 @@ import org.goobi.production.properties.Type;
 
 public class WellcomeDocstructElement extends DocstructElement {
 
-//	List<ImportProperty> properties = new ArrayList<ImportProperty>();
-
-	// private List<SelectItem> copyList = new ArrayList<SelectItem>();
-	// private List<SelectItem> volumeList = new ArrayList<SelectItem>();
-
 	private ImportProperty copyProperty = new ImportProperty();
 	private ImportProperty volumeProperty = new ImportProperty();
 
