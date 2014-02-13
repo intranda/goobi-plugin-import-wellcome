@@ -50,9 +50,11 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
+
 import org.goobi.beans.Processproperty;
-import de.sub.goobi.config.ConfigMain;
+
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 
@@ -65,8 +67,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 	private static final String NAME = "Multiple Manifestation Millennium Import";
 //	private static final String ID = "MultipleManifestationMillenniumImport";
 	// private static final String VERSION = "0.1";
-	private static final String XSLT = ConfigMain.getParameter("xsltFolder") + "MARC21slim2MODS3.xsl";
-	private static final String MODS_MAPPING_FILE = ConfigMain.getParameter("xsltFolder") + "mods_map_multi.xml";
+	private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
+	private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map_multi.xml";
 	private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
 	private Prefs prefs;
