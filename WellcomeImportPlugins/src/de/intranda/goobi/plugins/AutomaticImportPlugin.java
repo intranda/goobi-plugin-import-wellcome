@@ -49,7 +49,6 @@ import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
-
 @PluginImplementation
 public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
@@ -447,7 +446,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public void deleteFiles(List<String> selectedFilenames) {
-        String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
+        String folder = ConfigPlugins.getPluginConfig(this).getString("importfolder", "/opt/digiverso/other/wellcome/import/");
         for (String filename : selectedFilenames) {
             File f = new File(folder, filename);
             FileUtils.deleteQuietly(f);
