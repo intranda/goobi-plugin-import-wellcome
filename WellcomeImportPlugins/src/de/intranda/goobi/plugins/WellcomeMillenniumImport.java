@@ -178,7 +178,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 if (root.getName().equals("record")) {
                     record = root;
                 } else {
-                    doc.getRootElement().getChild("record", MARC);
+                    record = doc.getRootElement().getChild("record", MARC);
                 }
                 List<Element> controlfields = record.getChildren("controlfield", MARC);
                 List<Element> datafields = record.getChildren("datafield", MARC);

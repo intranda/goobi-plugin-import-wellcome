@@ -407,17 +407,17 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<Record> splitRecords(String records) {
-        return null;
+        return new ArrayList<Record>();
     }
 
     @Override
     public List<Record> generateRecordsFromFile() {
-        return null;
+        return new ArrayList<Record>();
     }
 
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-        return null;
+        return new ArrayList<Record>();
     }
 
     @Override
@@ -426,12 +426,12 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> splitIds(String ids) {
-        return null;
+        return new ArrayList<String>();
     }
 
     @Override
     public List<ImportType> getImportTypes() {
-        return null;
+        return new ArrayList<ImportType>();
     }
 
     @Override
