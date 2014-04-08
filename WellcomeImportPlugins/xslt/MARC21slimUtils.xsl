@@ -31,7 +31,7 @@
 			<xsl:text> </xsl:text>
 		</xsl:param>
 		<xsl:param name="subfields"/>
-		<xsl:element name="datafield">
+		<xsl:element name="marc:datafield">
 			<xsl:attribute name="tag">
 				<xsl:value-of select="$tag"/>
 			</xsl:attribute>
