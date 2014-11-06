@@ -315,7 +315,8 @@ public class WellcomeUtils {
 			MetadataType mdType = prefs.getMetadataTypeByName(mdName);
 			if (mdType != null) {
 				try {
-					List<Element> eleXpathList = eleMetadata.getChildren("xpath", null);
+					@SuppressWarnings("unchecked")
+                    List<Element> eleXpathList = eleMetadata.getChildren("xpath", null);
 					if (mdType.getIsPerson()) {
 						// Persons
 						for (Element eleXpath : eleXpathList) {
@@ -324,7 +325,8 @@ public class WellcomeUtils {
 							XPath xpath = XPath.newInstance(query);
 							xpath.addNamespace(NS_MODS);
 							// Element eleValue = (Element) xpath.selectSingleNode(doc);
-							List<Element> eleValueList = xpath.selectNodes(doc);
+							@SuppressWarnings("unchecked")
+                            List<Element> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
 								for (Element eleValue : eleValueList) {
 									String name = "";
@@ -376,7 +378,8 @@ public class WellcomeUtils {
 							// logger.debug("XPath: " + query);
 							XPath xpath = XPath.newInstance(query);
 							xpath.addNamespace(NS_MODS);
-							List<Element> eleValueList = xpath.selectNodes(doc);
+							@SuppressWarnings("unchecked")
+                            List<Element> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
 								for (Element eleValue : eleValueList) {
 									List<String> values = new ArrayList<String>();
@@ -431,5 +434,9 @@ public class WellcomeUtils {
 		// }
 
 	}
+
+    public static String getAIDownloadIdentifier(Prefs prefs, DocStruct ds) throws MetadataTypeNotAllowedException, DocStructHasNoTypeException {
+        return getMetadataValue(prefs, ds, "IADownloadIdentifier");
+    }
 	
 }

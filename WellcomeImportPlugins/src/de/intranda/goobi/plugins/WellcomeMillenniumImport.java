@@ -76,11 +76,14 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     private String importFolder = "C:/Goobi/";
     private Map<String, String> map = new HashMap<String, String>();
     private String currentIdentifier;
-    private String currentTitle;
+    //    private String currentTitle;
     private String currentWellcomeIdentifier;
-    private String currentWellcomeLeader6;
-    private String currentAuthor;
+    //    private String currentWellcomeLeader6;
+    //    private String currentAuthor;
     private List<String> currentCollectionList;
+
+    // TODO add IA download identifier
+    private String currentIADownloadIdentifier;
     private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
     public WellcomeMillenniumImport() {
@@ -246,11 +249,11 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSection(MODS_MAPPING_FILE, this.prefs, dsRoot, dsBoundBook, eleMods);
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
-                this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+                //                this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
+                //                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
-
+                //                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
+                currentIADownloadIdentifier = WellcomeUtils.getAIDownloadIdentifier(prefs, dsRoot);
                 // Add dummy volume to anchors
                 if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
                     DocStruct dsVolume = null;
@@ -511,13 +514,19 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         // if (StringUtils.isNotBlank(this.currentTitle)) {
         // return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
         // }
+        String returnvalue = "";
+        if (currentIADownloadIdentifier != null) {
+            returnvalue = currentIADownloadIdentifier + "_";
+        }
+
         if (this.currentWellcomeIdentifier != null) {
             String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
             if (StringUtils.isNotBlank(temp)) {
-                return temp.toLowerCase() + "_" + this.currentIdentifier;
+                returnvalue = returnvalue + temp.toLowerCase() + "_";
             }
         }
-        return this.currentIdentifier;
+        returnvalue = returnvalue + this.currentIdentifier;
+        return returnvalue;
     }
 
     @Override
