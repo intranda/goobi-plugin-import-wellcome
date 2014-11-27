@@ -82,7 +82,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     //    private String currentAuthor;
     private List<String> currentCollectionList;
 
-    // TODO add IA download identifier
+    // add IA download identifier
     private String currentIADownloadIdentifier;
     private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
@@ -516,7 +516,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         // }
         String returnvalue = "";
         if (currentIADownloadIdentifier != null) {
-            returnvalue = currentIADownloadIdentifier + "_";
+            returnvalue = currentIADownloadIdentifier.replaceAll("\\W", "_") + "_";
         }
 
         if (this.currentWellcomeIdentifier != null) {
