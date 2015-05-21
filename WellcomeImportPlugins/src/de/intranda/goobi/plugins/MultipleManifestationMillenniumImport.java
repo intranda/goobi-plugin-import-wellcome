@@ -71,6 +71,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map_multi.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
+
     private Prefs prefs;
     private String data = "";
     private File importFile = null;
