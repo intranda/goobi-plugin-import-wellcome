@@ -10,13 +10,13 @@ import java.util.List;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
 
 import ugh.dl.DocStruct;
 import ugh.dl.Metadata;
@@ -209,9 +209,10 @@ public class WellcomeUtils {
 							XPath xpath = XPath.newInstance(query);
 							xpath.addNamespace(NS_MODS);
 							// Element eleValue = (Element) xpath.selectSingleNode(doc);
-							List<Element> eleValueList = xpath.selectNodes(doc);
+							List<?> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
-								for (Element eleValue : eleValueList) {
+								for (Object ele : eleValueList) {
+								    Element eleValue = (Element)ele;
 									String name = "";
 									String firstName = "";
 									String lastName = "";
@@ -257,9 +258,10 @@ public class WellcomeUtils {
 							// logger.debug("XPath: " + query);
 							XPath xpath = XPath.newInstance(query);
 							xpath.addNamespace(NS_MODS);
-							List<Element> eleValueList = xpath.selectNodes(doc);
+							List<?> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
-								for (Element eleValue : eleValueList) {
+							    for (Object ele : eleValueList) {
+                                    Element eleValue = (Element)ele;
 									List<String> values = new ArrayList<String>();
 									// logger.debug("value: " + eleValue.getTextTrim());
 									// System.out.println("value: " + eleValue.getTextTrim());
@@ -326,9 +328,10 @@ public class WellcomeUtils {
 							xpath.addNamespace(NS_MODS);
 							// Element eleValue = (Element) xpath.selectSingleNode(doc);
 							@SuppressWarnings("unchecked")
-                            List<Element> eleValueList = xpath.selectNodes(doc);
+                            List<?> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
-								for (Element eleValue : eleValueList) {
+							    for (Object ele : eleValueList) {
+                                    Element eleValue = (Element)ele;
 									String name = "";
 									String firstName = "";
 									String lastName = "";
@@ -379,9 +382,10 @@ public class WellcomeUtils {
 							XPath xpath = XPath.newInstance(query);
 							xpath.addNamespace(NS_MODS);
 							@SuppressWarnings("unchecked")
-                            List<Element> eleValueList = xpath.selectNodes(doc);
+                            List<?> eleValueList = xpath.selectNodes(doc);
 							if (eleValueList != null) {
-								for (Element eleValue : eleValueList) {
+							    for (Object ele : eleValueList) {
+                                    Element eleValue = (Element)ele;
 									List<String> values = new ArrayList<String>();
 									// logger.debug("value: " + eleValue.getTextTrim());
 									// System.out.println("value: " + eleValue.getTextTrim());

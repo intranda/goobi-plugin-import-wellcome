@@ -2999,9 +2999,9 @@
     <xsl:template match="marc:datafield[@tag=656]">
         <subject>
             <xsl:call-template name="xxx880" />
-            <xsl:if test="marc:subfield[@code=2]">
+            <xsl:if test="marc:subfield[@code='2']">
                 <xsl:attribute name="authority">
-					<xsl:value-of select="marc:subfield[@code=2]" />
+					<xsl:value-of select="marc:subfield[@code='2']" />
 				</xsl:attribute>
             </xsl:if>
             <occupation>
@@ -4618,7 +4618,7 @@
 							<xsl:text>marcgac</xsl:text>
 						</xsl:if>
 						<xsl:if test="@code='b'">
-							<xsl:value-of select="following-sibling::marc:subfield[@code=2]" />
+							<xsl:value-of select="following-sibling::marc:subfield[@code='2']" />
 						</xsl:if>
 						<xsl:if test="@code='c'">
 							<xsl:text>iso3166</xsl:text>
@@ -4801,9 +4801,9 @@
     <xsl:template name="createSubChronFrom648">
         <subject>
             <xsl:call-template name="xxx880" />
-            <xsl:if test="marc:subfield[@code=2]">
+            <xsl:if test="marc:subfield[@code='2']">
                 <xsl:attribute name="authority">
-					<xsl:value-of select="marc:subfield[@code=2]" />
+					<xsl:value-of select="marc:subfield[@code='2']" />
 				</xsl:attribute>
             </xsl:if>
             <xsl:call-template name="uri" />
@@ -4871,9 +4871,9 @@
     <xsl:template name="createSubFrom656">
         <subject>
             <xsl:call-template name="xxx880" />
-            <xsl:if test="marc:subfield[@code=2]">
+            <xsl:if test="marc:subfield[@code='2']">
                 <xsl:attribute name="authority">
-					<xsl:value-of select="marc:subfield[@code=2]" />
+					<xsl:value-of select="marc:subfield[@code='2']" />
 				</xsl:attribute>
             </xsl:if>
             <occupation>

@@ -7,7 +7,7 @@
     </metadata>
     <metadata logical="true">
         <name>TitleDocMain</name>
-        <xpath>/mods:mods/mods:titleInfo[not(@type='alternative')]/mods:*
+        <xpath>/mods:mods/mods:titleInfo[not(@type='alternative')]/mods:title
         </xpath>
     </metadata>
     <metadata logical="true">
