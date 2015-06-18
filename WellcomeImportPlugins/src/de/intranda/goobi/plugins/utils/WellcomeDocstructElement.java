@@ -26,7 +26,7 @@ public class WellcomeDocstructElement extends DocstructElement {
 		volumeProperty.setType(Type.LIST);
 		List<String> values = new ArrayList<String>();
 		values.add("N/A");
-		for (int i = 1; i <= 30; i++) {
+		for (int i = 1; i <= 40; i++) {
 			values.add(String.valueOf(i));
 		}
 		volumeProperty.setPossibleValues(values);
@@ -37,7 +37,7 @@ public class WellcomeDocstructElement extends DocstructElement {
 		copyProperty.setType(Type.LIST);
 		List<String> possibleValues = new ArrayList<String>();
 		possibleValues.add("N/A");
-		for (int i = 1; i <= 30; i++) {
+		for (int i = 1; i <= 40; i++) {
 			possibleValues.add(String.valueOf(i));
 		}
 		copyProperty.setPossibleValues(possibleValues);
