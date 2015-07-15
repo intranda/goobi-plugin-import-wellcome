@@ -180,7 +180,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         return NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Fileformat convertData() throws ImportPluginException {
         Fileformat ff = null;
@@ -787,35 +786,5 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     public void setDocstruct(WellcomeDocstructElement dse) {
         docstruct = dse;
-    }
-
-    public static void main(String[] args) throws PreferencesException, WriteException, ImportPluginException {
-
-        File[] calms = new File("/opt/digiverso/goobi/import/millennium/").listFiles();
-        MultipleManifestationMillenniumImport wci = new MultipleManifestationMillenniumImport();
-        Prefs prefs = new Prefs();
-        wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
-        wci.setPrefs(prefs);
-        wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/wellcome.xml");
-        List<Record> recordList = new ArrayList<Record>();
-        File filename = new File("/home/robert/b16756654.xml");
-        // for (File filename : calms) {
-        // File filename = calms[0];
-        wci.setFile(filename);
-        recordList.addAll(wci.generateRecordsFromFile());
-        // }
-        // Record r = recordList.get(0);
-        for (Record r : recordList) {
-            wci.data = r.getData();
-            Fileformat ff = wci.convertData();
-            if (ff != null) {
-                MetsMods mm = new MetsMods(prefs);
-                mm.setDigitalDocument(ff.getDigitalDocument());
-                String fileName = wci.getImportFolder() + wci.getProcessTitle() + ".xml";
-                logger.debug("Writing '" + fileName + "' into given folder...");
-                mm.write(fileName);
-            }
-        }
-
     }
 }
