@@ -260,6 +260,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 // this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
                 // this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
+                // TODO add year 
+                
                 String strId = String.valueOf(docstruct.getOrder());
                 if (docstruct.getOrder() < 10) {
                     strId = "000" + strId;

@@ -29,7 +29,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
-
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.DocStructType;
@@ -64,7 +63,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     private String currentTitle;
 
-    private String currentAuthor;
+//    private String currentAuthor;
 
     private String currentIdentifier;
 
@@ -149,6 +148,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Fileformat convertData() {
         Fileformat ff = null;
@@ -236,7 +236,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                 }
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
                 this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+//                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 
                 Metadata dateDigitization = new Metadata(this.prefs.getMetadataTypeByName("_dateDigitization"));
                 dateDigitization.setValue("2012");
@@ -406,6 +406,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<Record> generateRecordsFromFile() {
         List<Record> ret = new ArrayList<Record>();
@@ -520,6 +521,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         return answer;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");

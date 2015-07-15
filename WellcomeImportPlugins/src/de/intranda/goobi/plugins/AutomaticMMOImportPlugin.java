@@ -180,11 +180,22 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
-                //                this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
+
+                // add publication year to order
+                MetadataType yearType = prefs.getMetadataTypeByName("PublicationYear");
+                if (dsRoot.getAllMetadataByType(yearType) != null && !dsRoot.getAllMetadataByType(yearType).isEmpty()) {
+                    Metadata md = dsRoot.getAllMetadataByType(yearType).get(0);
+                    if (md.getValue().matches("\\d\\d\\d\\d")) {
+                        order = md.getValue() + order;
+                    }
+                } else if (dsVolume.getAllMetadataByType(yearType) != null && !dsVolume.getAllMetadataByType(yearType).isEmpty()) {
+                    Metadata md = dsVolume.getAllMetadataByType(yearType).get(0);
+                    if (md.getValue().matches("\\d\\d\\d\\d")) {
+                        order = md.getValue() + order;
+                    }
+                }
+
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-                // this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                // this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
-                // this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
                 MetadataType mdt = this.prefs.getMetadataTypeByName("CatalogIDDigital");
 

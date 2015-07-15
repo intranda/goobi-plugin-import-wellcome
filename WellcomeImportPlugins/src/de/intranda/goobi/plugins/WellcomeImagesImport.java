@@ -65,7 +65,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
     private String currentTitle;
 
-    private String currentAuthor;
+//    private String currentAuthor;
 
     private String currentIdentifier;
 
@@ -245,7 +245,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
                 this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+//                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
             }
             File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
             WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_WellcomeImages", doc);

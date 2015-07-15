@@ -167,7 +167,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Fileformat convertData() throws ImportPluginException {
         Fileformat ff = null;
