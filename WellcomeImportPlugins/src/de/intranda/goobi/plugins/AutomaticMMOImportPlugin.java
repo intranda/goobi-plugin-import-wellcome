@@ -111,7 +111,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         Fileformat ff = null;
         Document doc;
         try {
-            String filename = currentRecord.getId().replace(".xml", "");
+            String filename = currentRecord.getId().replace(".xml", "").replace("_marc", "");
             String anchorIdentifier = filename.substring(0, filename.indexOf("_"));
             String order = filename.substring(filename.indexOf("_") + 1);
             doc = new SAXBuilder().build(new StringReader(this.currentRecord.getData()));
@@ -435,6 +435,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<ImportType> getImportTypes() {
+        // TODO  return new ArrayList<ImportType>();
         List<ImportType> answer = new ArrayList<ImportType>();
         answer.add(ImportType.FOLDER);
         return answer;
