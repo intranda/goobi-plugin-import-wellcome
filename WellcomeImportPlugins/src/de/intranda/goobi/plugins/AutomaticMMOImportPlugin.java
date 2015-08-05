@@ -181,6 +181,13 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
 
+                // order zweistellig
+                int orderNo = Integer.parseInt(order);
+                if (orderNo < 10) {
+                    order = "0" + orderNo;
+                } else {
+                    order = "" + orderNo;
+                }
                 // add publication year to order
                 MetadataType yearType = prefs.getMetadataTypeByName("PublicationYear");
                 if (dsRoot.getAllMetadataByType(yearType) != null && !dsRoot.getAllMetadataByType(yearType).isEmpty()) {
