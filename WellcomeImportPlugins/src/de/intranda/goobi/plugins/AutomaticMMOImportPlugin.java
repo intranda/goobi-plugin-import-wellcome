@@ -335,54 +335,55 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         List<ImportObject> answer = new ArrayList<ImportObject>();
 
         if (records.size() > 0) {
-            Record r = records.get(0);
-            this.currentRecord = r;
+            for (Record r : records) {
+                //            Record r = records.get(0);
+                this.currentRecord = r;
 
-            ImportObject io = new ImportObject();
-            Fileformat ff = null;
-            try {
-                ff = convertData();
-            } catch (ImportPluginException e1) {
-                io.setErrorMessage(e1.getMessage());
-            }
-            if (r.getId() != null) {
-                io.setImportFileName(r.getId());
-            }
-            generateProperties(io);
-            io.setProcessTitle(getProcessTitle());
-            if (ff != null) {
-                r.setId(currentRecord.getId().replace(".xml", ""));
+                ImportObject io = new ImportObject();
+                Fileformat ff = null;
                 try {
-                    MetsMods mm = new MetsMods(this.prefs);
-                    mm.setDigitalDocument(ff.getDigitalDocument());
-                    String fileName = getImportFolder() + getProcessTitle() + ".xml";
-                    logger.debug("Writing '" + fileName + "' into given folder...");
-                    mm.write(fileName);
-                    io.setMetsFilename(fileName);
-                    io.setImportReturnValue(ImportReturnValue.ExportFinished);
-                    // ret.put(getProcessTitle(),
-                    // ImportReturnValue.ExportFinished);
-                } catch (PreferencesException e) {
-                    logger.error(e.getMessage(), e);
-                    io.setErrorMessage(e.getMessage());
+                    ff = convertData();
+                } catch (ImportPluginException e1) {
+                    io.setErrorMessage(e1.getMessage());
+                }
+                if (r.getId() != null) {
+                    io.setImportFileName(r.getId());
+                }
+                generateProperties(io);
+                io.setProcessTitle(getProcessTitle());
+                if (ff != null) {
+                    r.setId(currentRecord.getId().replace(".xml", ""));
+                    try {
+                        MetsMods mm = new MetsMods(this.prefs);
+                        mm.setDigitalDocument(ff.getDigitalDocument());
+                        String fileName = getImportFolder() + getProcessTitle() + ".xml";
+                        logger.debug("Writing '" + fileName + "' into given folder...");
+                        mm.write(fileName);
+                        io.setMetsFilename(fileName);
+                        io.setImportReturnValue(ImportReturnValue.ExportFinished);
+                        // ret.put(getProcessTitle(),
+                        // ImportReturnValue.ExportFinished);
+                    } catch (PreferencesException e) {
+                        logger.error(e.getMessage(), e);
+                        io.setErrorMessage(e.getMessage());
+                        io.setImportReturnValue(ImportReturnValue.InvalidData);
+                        // ret.put(getProcessTitle(),
+                        // ImportReturnValue.InvalidData);
+                    } catch (WriteException e) {
+                        logger.error(e.getMessage(), e);
+                        io.setImportReturnValue(ImportReturnValue.WriteError);
+                        io.setErrorMessage(e.getMessage());
+                        // ret.put(getProcessTitle(),
+                        // ImportReturnValue.WriteError);
+                    }
+                } else {
                     io.setImportReturnValue(ImportReturnValue.InvalidData);
                     // ret.put(getProcessTitle(),
                     // ImportReturnValue.InvalidData);
-                } catch (WriteException e) {
-                    logger.error(e.getMessage(), e);
-                    io.setImportReturnValue(ImportReturnValue.WriteError);
-                    io.setErrorMessage(e.getMessage());
-                    // ret.put(getProcessTitle(),
-                    // ImportReturnValue.WriteError);
                 }
-            } else {
-                io.setImportReturnValue(ImportReturnValue.InvalidData);
-                // ret.put(getProcessTitle(),
-                // ImportReturnValue.InvalidData);
+                answer.add(io);
             }
-            answer.add(io);
         }
-
         return answer;
     }
 
