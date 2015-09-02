@@ -316,10 +316,19 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
-            pe.setWert(currentRecord.getId().replace(".xml", ""));
+            pe.setWert(currentRecord.getId().replace(".xml", "").replace("_marc", ""));
             pe.setType(PropertyType.String);
             io.getProcessProperties().add(pe);
         }
+        {
+            Processproperty pe = new Processproperty();
+            pe.setTitel("schemaName");
+            pe.setWert("Digitised");
+            pe.setType(PropertyType.String);
+            io.getProcessProperties().add(pe);
+        }
+        
+
 
         //		{
         //			Prozesseigenschaft pe = new Prozesseigenschaft();
@@ -410,10 +419,10 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         if (this.currentWellcomeIdentifier != null) {
             String temp = this.currentWellcomeIdentifier.replaceAll("\\W", "_");
             if (StringUtils.isNotBlank(temp)) {
-                return temp.toLowerCase() + "_" + currentRecord.getId().replace(".xml", "");
+                return temp.toLowerCase() + "_" + currentRecord.getId().replace(".xml", "").replace("_marc", "");
             }
         }
-        return currentRecord.getId().replace(".xml", "");
+        return currentRecord.getId().replace(".xml", "").replace("_marc", "");
     }
 
     @Override
