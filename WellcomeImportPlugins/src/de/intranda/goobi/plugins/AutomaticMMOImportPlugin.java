@@ -322,12 +322,18 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         }
         {
             Processproperty pe = new Processproperty();
-            pe.setTitel("schemaName");
+            pe.setTitel("CollectionName1");
             pe.setWert("Digitised");
             pe.setType(PropertyType.String);
             io.getProcessProperties().add(pe);
         }
-        
+        {
+            Processproperty pe = new Processproperty();
+            pe.setTitel("schemaName");
+            pe.setWert("Millennium");
+            pe.setType(PropertyType.String);
+            io.getProcessProperties().add(pe);
+        }
 
 
         //		{
