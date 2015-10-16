@@ -181,6 +181,9 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
 
+                Metadata volumeType = new Metadata(this.prefs.getMetadataTypeByName("_volume"));
+                volumeType.setValue(order);
+                
                 // order zweistellig
                 int orderNo = Integer.parseInt(order);
                 if (orderNo < 10) {
@@ -229,6 +232,9 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
                 manifestationType.setValue("General");
 
+
+                dsVolume.addMetadata(volumeType);
+                
                 dsRoot.addMetadata(manifestationType);
 
                 // Add 'pathimagefiles'
