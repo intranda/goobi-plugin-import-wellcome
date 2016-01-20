@@ -89,7 +89,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
             ImportProperty ip = new ImportProperty();
             ip.setName("CollectionName2");
             ip.setType(Type.TEXT);
-            ip.setRequired(true);
+            ip.setRequired(false);
             this.properties.add(ip);
         }
         {
