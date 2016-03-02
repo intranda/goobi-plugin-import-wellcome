@@ -46,6 +46,7 @@ import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import org.goobi.beans.Processproperty;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 
 @PluginImplementation
@@ -596,6 +597,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
     public void setDocstruct(DocstructElement dse) {
         // TODO Auto-generated method stub
 
+    }
+
+    
+    public void setForm(MassImportForm form) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

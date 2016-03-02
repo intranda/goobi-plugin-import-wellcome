@@ -47,6 +47,7 @@ import ugh.fileformats.mets.MetsMods;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 @PluginImplementation
@@ -479,6 +480,12 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public void setDocstruct(DocstructElement dse) {
+    }
+
+    
+    public void setForm(MassImportForm form) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -51,6 +51,7 @@ import org.goobi.beans.Processproperty;
 
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 
@@ -558,5 +559,11 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
     }
 
     public void setDocstruct(WellcomeDocstructElement dse) {
+    }
+
+    
+    public void setForm(MassImportForm form) {
+        // TODO Auto-generated method stub
+        
     }
 }

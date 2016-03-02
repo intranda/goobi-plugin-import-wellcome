@@ -36,7 +36,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
-
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
@@ -56,6 +55,7 @@ import org.goobi.beans.Processproperty;
 
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 
@@ -87,6 +87,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     private String currentIADownloadIdentifier;
     private List<ImportProperty> properties = new ArrayList<ImportProperty>();
 
+    private MassImportForm form;
+    
     public WellcomeMillenniumImport() {
 
         this.map.put("?Monographic", "Monograph");
@@ -387,6 +389,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         List<ImportObject> answer = new ArrayList<ImportObject>();
 
         for (Record r : records) {
+            form.addProcessToProgressBar();
             this.data = r.getData();
             this.currentCollectionList = r.getCollections();
             ImportObject io = new ImportObject();
@@ -714,6 +717,12 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     public void setDocstruct(DocstructElement dse) {
         // TODO Auto-generated method stub
 
+    }
+
+    
+    public void setForm(MassImportForm form) {
+        this.form = form;
+        
     }
 
 }

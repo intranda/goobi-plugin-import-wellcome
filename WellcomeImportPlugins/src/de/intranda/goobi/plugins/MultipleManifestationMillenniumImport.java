@@ -55,6 +55,7 @@ import org.goobi.beans.Processproperty;
 
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 
@@ -87,6 +88,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     private WellcomeDocstructElement docstruct;
     private HashMap<String, String> structType = new HashMap<String, String>();;
 
+    private MassImportForm form;
+    
     public MultipleManifestationMillenniumImport() {
         structType.put("Archive", "ArchiveManifestation");
         structType.put("Artwork", "ArtworkManifestation");
@@ -420,6 +423,10 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         //		}
     }
 
+    public void setForm(MassImportForm form) {
+        this.form = form;
+    }
+    
     @Override
     public List<ImportObject> generateFiles(List<Record> records) {
         List<ImportObject> answer = new ArrayList<ImportObject>();
@@ -429,6 +436,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             this.data = r.getData();
             this.currentCollectionList = r.getCollections();
             for (DocstructElement dse : currentDocStructs) {
+                
+                form.addProcessToProgressBar();
+                
                 docstruct = (WellcomeDocstructElement) dse;
                 ImportObject io = new ImportObject();
                 Fileformat ff = null;
