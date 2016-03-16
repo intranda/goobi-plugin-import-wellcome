@@ -178,7 +178,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         return NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return NAME;
     }

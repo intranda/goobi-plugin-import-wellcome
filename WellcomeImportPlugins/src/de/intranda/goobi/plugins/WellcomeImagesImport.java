@@ -129,7 +129,7 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return NAME;
     }

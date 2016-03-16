@@ -102,7 +102,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return NAME;
     }

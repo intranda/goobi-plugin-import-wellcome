@@ -101,7 +101,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
         return COMMAND_NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return COMMAND_NAME;
     }

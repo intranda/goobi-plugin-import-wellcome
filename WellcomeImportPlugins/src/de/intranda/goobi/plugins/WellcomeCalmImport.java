@@ -132,7 +132,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return NAME;
     }
