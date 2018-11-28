@@ -496,6 +496,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
             Document doc = new SAXBuilder().build(file);
             if (doc != null && doc.getRootElement() != null) {
                 Record record = new Record();
+                record.setId(file.getName());
                 record.setData(new XMLOutputter().outputString(doc));
                 return record;
 

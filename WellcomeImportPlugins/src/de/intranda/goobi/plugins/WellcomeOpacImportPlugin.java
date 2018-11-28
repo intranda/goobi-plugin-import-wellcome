@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class WellcomeOpacImportPlugin implements IImportPluginVersion2, IPlugin 
 
     private File file;
 
-    private List<ImportType> importTypes;
+    private List<ImportType> importTypes = Collections.emptyList();
 
     private static final String SPLIT_REGEX = "[\\s;,]";
 
