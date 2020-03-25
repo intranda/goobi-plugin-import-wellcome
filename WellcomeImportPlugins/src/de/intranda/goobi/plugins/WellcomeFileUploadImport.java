@@ -466,10 +466,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
             } catch (IOException e) {
                 log.error(e);
             }
-
-
         }
-
         return answer;
     }
 

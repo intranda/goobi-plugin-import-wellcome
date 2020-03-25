@@ -12,17 +12,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.goobi.production.importer.DocstructElement;
-import org.goobi.production.importer.ImportObject;
-import org.goobi.production.importer.Record;
+import org.goobi.beans.Processproperty;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
+import org.goobi.production.importer.DocstructElement;
+import org.goobi.production.importer.ImportObject;
+import org.goobi.production.importer.Record;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.properties.ImportProperty;
@@ -35,6 +34,14 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
+import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
+import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.enums.PropertyType;
+import de.sub.goobi.helper.exceptions.ImportPluginException;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
@@ -48,16 +55,6 @@ import ugh.exceptions.TypeNotAllowedAsChildException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
-import de.intranda.goobi.plugins.utils.WellcomeUtils;
-
-import org.goobi.beans.Processproperty;
-
-import de.sub.goobi.config.ConfigPlugins;
-import de.sub.goobi.config.ConfigurationHelper;
-import de.sub.goobi.forms.MassImportForm;
-import de.sub.goobi.helper.enums.PropertyType;
-import de.sub.goobi.helper.exceptions.ImportPluginException;
 
 @PluginImplementation
 public class MultipleManifestationMillenniumImport implements IImportPlugin, IPlugin {
@@ -83,13 +80,13 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     // private String currentWellcomeLeader6;
     // private String currentAuthor;
     private List<String> currentCollectionList;
-    private List<ImportProperty> properties = new ArrayList<ImportProperty>();
-    private List<WellcomeDocstructElement> currentDocStructs = new ArrayList<WellcomeDocstructElement>();
+    private List<ImportProperty> properties = new ArrayList<>();
+    private List<WellcomeDocstructElement> currentDocStructs = new ArrayList<>();
     private WellcomeDocstructElement docstruct;
-    private HashMap<String, String> structType = new HashMap<String, String>();;
+    private HashMap<String, String> structType = new HashMap<>();;
 
     private MassImportForm form;
-    
+
     public MultipleManifestationMillenniumImport() {
         structType.put("Archive", "ArchiveManifestation");
         structType.put("Artwork", "ArtworkManifestation");
@@ -111,7 +108,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             ImportProperty ip = new ImportProperty();
             ip.setName("CollectionName1");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("Digitised");
             values.add("Born digital");
             ip.setPossibleValues(values);
@@ -129,7 +126,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             ImportProperty ip = new ImportProperty();
             ip.setName("securityTag");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("open");
             values.add("closed");
             ip.setPossibleValues(values);
@@ -140,7 +137,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             ImportProperty ip = new ImportProperty();
             ip.setName("schemaName");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("Millennium");
             ip.setPossibleValues(values);
             ip.setRequired(true);
@@ -151,7 +148,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             ImportProperty ip = new ImportProperty();
             ip.setName("Multiple manifestation type");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("General");
             values.add("Video & transcript & poster image");
             values.add("Video & transcript");
@@ -178,7 +175,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         return NAME;
     }
 
-    
+
     public String getDescription() {
         return NAME;
     }
@@ -263,8 +260,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 // this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
                 // this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
 
-                // TODO add year 
-                
+                // TODO add year
+
                 String strId = String.valueOf(docstruct.getOrder());
                 if (docstruct.getOrder() < 10) {
                     strId = "000" + strId;
@@ -423,22 +420,23 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         //		}
     }
 
+    @Override
     public void setForm(MassImportForm form) {
         this.form = form;
     }
-    
+
     @Override
     public List<ImportObject> generateFiles(List<Record> records) {
-        List<ImportObject> answer = new ArrayList<ImportObject>();
+        List<ImportObject> answer = new ArrayList<>();
 
         if (records.size() > 0) {
             Record r = records.get(0);
             this.data = r.getData();
             this.currentCollectionList = r.getCollections();
             for (DocstructElement dse : currentDocStructs) {
-                
+
                 form.addProcessToProgressBar();
-                
+
                 docstruct = (WellcomeDocstructElement) dse;
                 ImportObject io = new ImportObject();
                 Fileformat ff = null;
@@ -490,7 +488,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<Record> generateRecordsFromFile() {
-        List<Record> ret = new ArrayList<Record>();
+        List<Record> ret = new ArrayList<>();
         // InputStream input = null;
         try {
             Document doc = new SAXBuilder().build(this.importFile);
@@ -514,10 +512,10 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<Record> splitRecords(String records) {
-        List<Record> ret = new ArrayList<Record>();
+        List<Record> ret = new ArrayList<>();
 
         // Split strings
-        List<String> recordStrings = new ArrayList<String>();
+        List<String> recordStrings = new ArrayList<>();
         BufferedReader inputStream = new BufferedReader(new StringReader(records));
 
         StringBuilder sb = new StringBuilder();
@@ -561,7 +559,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<String> splitIds(String ids) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -613,7 +611,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<ImportType> getImportTypes() {
-        List<ImportType> answer = new ArrayList<ImportType>();
+        List<ImportType> answer = new ArrayList<>();
         answer.add(ImportType.Record);
         answer.add(ImportType.FILE);
         answer.add(ImportType.FOLDER);
@@ -687,7 +685,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<String> getAllFilenames() {
-        List<String> answer = new ArrayList<String>();
+        List<String> answer = new ArrayList<>();
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
         File f = new File(folder);
         if (f.exists() && f.isDirectory()) {
@@ -703,7 +701,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         for (String filename : filenames) {
             File f = new File(folder, filename);
             try {
@@ -767,7 +765,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<String> getPossibleDocstructs() {
-        List<String> dsl = new ArrayList<String>();
+        List<String> dsl = new ArrayList<>();
         dsl.add("Archive");
         dsl.add("Artwork");
         dsl.add("Audio");

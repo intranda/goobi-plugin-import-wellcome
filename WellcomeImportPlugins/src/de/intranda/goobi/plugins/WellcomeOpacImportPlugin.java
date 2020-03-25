@@ -34,13 +34,12 @@ import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.Fileformat;
 import ugh.dl.Prefs;
 
 @Data
 @Log4j
-@PluginImplementation
+//@PluginImplementation
 public class WellcomeOpacImportPlugin implements IImportPluginVersion2, IPlugin {
 
     private PluginType type = PluginType.Import;

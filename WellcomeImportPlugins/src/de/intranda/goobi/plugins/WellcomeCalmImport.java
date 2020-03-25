@@ -8,17 +8,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.goobi.production.importer.DocstructElement;
-import org.goobi.production.importer.ImportObject;
-import org.goobi.production.importer.Record;
+import org.goobi.beans.Processproperty;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
+import org.goobi.production.importer.DocstructElement;
+import org.goobi.production.importer.ImportObject;
+import org.goobi.production.importer.Record;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.properties.ImportProperty;
@@ -29,6 +28,10 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
+import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.enums.PropertyType;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.DocStructType;
@@ -41,15 +44,8 @@ import ugh.exceptions.PreferencesException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-import de.intranda.goobi.plugins.utils.WellcomeUtils;
 
-import org.goobi.beans.Processproperty;
-
-import de.sub.goobi.config.ConfigPlugins;
-import de.sub.goobi.forms.MassImportForm;
-import de.sub.goobi.helper.enums.PropertyType;
-
-@PluginImplementation
+//@PluginImplementation
 public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     /** Logger for this class. */
@@ -64,7 +60,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     private String currentTitle;
 
-//    private String currentAuthor;
+    //    private String currentAuthor;
 
     private String currentIdentifier;
 
@@ -73,7 +69,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
     private String altRefNo = "";
     //	private String b-number ="";
 
-    private List<ImportProperty> properties = new ArrayList<ImportProperty>();
+    private List<ImportProperty> properties = new ArrayList<>();
 
     public WellcomeCalmImport() {
 
@@ -81,7 +77,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             ImportProperty ip = new ImportProperty();
             ip.setName("CollectionName1");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("Digitised");
             values.add("Born digital");
             ip.setPossibleValues(values);
@@ -99,7 +95,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             ImportProperty ip = new ImportProperty();
             ip.setName("securityTag");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("open");
             values.add("closed");
             ip.setPossibleValues(values);
@@ -110,7 +106,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             ImportProperty ip = new ImportProperty();
             ip.setName("schemaName");
             ip.setType(Type.LIST);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             values.add("CALM");
             ip.setPossibleValues(values);
             ip.setRequired(true);
@@ -132,7 +128,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    
+
     public String getDescription() {
         return NAME;
     }
@@ -198,7 +194,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                         Element sub = dScribeRecord;
                         for (String subString : subElements) {
                             if (sub.getChildren(subString).size() > 0) {
-                                sub = (Element) sub.getChildren(subString).get(0);
+                                sub = sub.getChildren(subString).get(0);
                             }
                         }
                         if (!sub.getName().equals(subElements[subElements.length])) {
@@ -237,7 +233,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                 }
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
                 this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-//                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
+                //                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
 
                 Metadata dateDigitization = new Metadata(this.prefs.getMetadataTypeByName("_dateDigitization"));
                 dateDigitization.setValue("2012");
@@ -309,7 +305,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     @Override
     public List<Record> splitRecords(String records) {
-        List<Record> ret = new ArrayList<Record>();
+        List<Record> ret = new ArrayList<>();
         Record r = new Record();
         r.setData(records);
         ret.add(r);
@@ -318,7 +314,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     @Override
     public List<ImportObject> generateFiles(List<Record> records) {
-        List<ImportObject> answer = new ArrayList<ImportObject>();
+        List<ImportObject> answer = new ArrayList<>();
 
         for (Record r : records) {
             this.data = r.getData();
@@ -410,7 +406,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
     @SuppressWarnings("deprecation")
     @Override
     public List<Record> generateRecordsFromFile() {
-        List<Record> ret = new ArrayList<Record>();
+        List<Record> ret = new ArrayList<>();
         try {
             SAXBuilder sb = new SAXBuilder(false);
             sb.setValidation(false);
@@ -440,12 +436,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> splitIds(String ids) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<ImportType> getImportTypes() {
-        List<ImportType> answer = new ArrayList<ImportType>();
+        List<ImportType> answer = new ArrayList<>();
         answer.add(ImportType.Record);
         answer.add(ImportType.FILE);
         answer.add(ImportType.FOLDER);
@@ -488,7 +484,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         wci.setImportFolder("/opt/digiverso/goobi/hotfolder/");
         wci.setPrefs(prefs);
         wci.prefs.loadPrefs("/opt/digiverso/goobi/rulesets/gdz.xml");
-        List<Record> recordList = new ArrayList<Record>();
+        List<Record> recordList = new ArrayList<>();
         for (File filename : calms) {
             wci.setFile(filename);
             recordList.addAll(wci.generateRecordsFromFile());
@@ -509,7 +505,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> getAllFilenames() {
-        List<String> answer = new ArrayList<String>();
+        List<String> answer = new ArrayList<>();
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
         File f = new File(folder);
         if (f.exists() && f.isDirectory()) {
@@ -526,7 +522,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         for (String filename : filenames) {
             File f = new File(folder, filename);
             try {
@@ -599,10 +595,11 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     }
 
-    
+
+    @Override
     public void setForm(MassImportForm form) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
