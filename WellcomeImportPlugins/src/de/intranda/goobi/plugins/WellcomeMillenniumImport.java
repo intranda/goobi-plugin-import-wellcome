@@ -62,7 +62,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     /** Logger for this class. */
     private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
 
-    private static final String NAME = "Millennium Import";
+    private String title = "Millennium Import";
     // private static final String VERSION = "0.1";
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map.xml";
@@ -148,7 +148,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     }
 
     public String getId() {
-        return NAME;
+        return getTitle();
     }
 
     @Override
@@ -158,12 +158,12 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
     @Override
     public String getTitle() {
-        return NAME;
+        return title;
     }
 
 
     public String getDescription() {
-        return NAME;
+        return getTitle();
     }
 
     @Override
@@ -722,5 +722,38 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         this.form = form;
 
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        WellcomeMillenniumImport other = (WellcomeMillenniumImport) obj;
+        if (title == null) {
+            if (other.title != null) {
+                return false;
+            }
+        } else if (!title.equals(other.title)) {
+            return false;
+        }
+        return true;
+    }
+
+
+
 
 }

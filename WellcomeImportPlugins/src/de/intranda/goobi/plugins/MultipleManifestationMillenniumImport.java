@@ -62,7 +62,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     /** Logger for this class. */
     private static final Logger logger = Logger.getLogger(MultipleManifestationMillenniumImport.class);
 
-    private static final String NAME = "Multiple Manifestation Millennium Import";
+    private String title = "Multiple Manifestation Millennium Import";
     //	private static final String ID = "MultipleManifestationMillenniumImport";
     // private static final String VERSION = "0.1";
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
@@ -162,7 +162,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     }
 
     public String getId() {
-        return NAME;
+        return title;
     }
 
     @Override
@@ -172,12 +172,12 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public String getTitle() {
-        return NAME;
+        return title;
     }
 
 
     public String getDescription() {
-        return NAME;
+        return title;
     }
 
     @Override
@@ -797,4 +797,36 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     public void setDocstruct(WellcomeDocstructElement dse) {
         docstruct = dse;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MultipleManifestationMillenniumImport other = (MultipleManifestationMillenniumImport) obj;
+        if (title == null) {
+            if (other.title != null) {
+                return false;
+            }
+        } else if (!title.equals(other.title)) {
+            return false;
+        }
+        return true;
+    }
+
+
 }
