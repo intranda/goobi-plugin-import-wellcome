@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import org.goobi.production.importer.Record;
 import org.goobi.production.plugin.interfaces.IImportPluginVersion2;
 import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.properties.ImportProperty;
-import org.goobi.production.properties.Type;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -95,7 +93,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     // add IA download identifier
     private String currentIADownloadIdentifier;
-    private List<ImportProperty> properties = new ArrayList<>();
+    //    private List<ImportProperty> properties = new ArrayList<>();
 
     @Setter
     private MassImportForm form;
@@ -125,45 +123,45 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         this.map.put("?Manuscript language material", "Archive");
         this.map.put("?BoundManuscript", "BoundManuscript");
 
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("CollectionName1");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("Digitised");
-            values.add("Born digital");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("CollectionName2");
-            ip.setType(Type.TEXT);
-            ip.setRequired(false);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("securityTag");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("open");
-            values.add("closed");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("schemaName");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("Millennium");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
+        //        {
+        //            ImportProperty ip = new ImportProperty();
+        //            ip.setName("CollectionName1");
+        //            ip.setType(Type.LIST);
+        //            List<String> values = new ArrayList<>();
+        //            values.add("Digitised");
+        //            values.add("Born digital");
+        //            ip.setPossibleValues(values);
+        //            ip.setRequired(true);
+        //            this.properties.add(ip);
+        //        }
+        //        {
+        //            ImportProperty ip = new ImportProperty();
+        //            ip.setName("CollectionName2");
+        //            ip.setType(Type.TEXT);
+        //            ip.setRequired(false);
+        //            this.properties.add(ip);
+        //        }
+        //        {
+        //            ImportProperty ip = new ImportProperty();
+        //            ip.setName("securityTag");
+        //            ip.setType(Type.LIST);
+        //            List<String> values = new ArrayList<>();
+        //            values.add("open");
+        //            values.add("closed");
+        //            ip.setPossibleValues(values);
+        //            ip.setRequired(true);
+        //            this.properties.add(ip);
+        //        }
+        //        {
+        //            ImportProperty ip = new ImportProperty();
+        //            ip.setName("schemaName");
+        //            ip.setType(Type.LIST);
+        //            List<String> values = new ArrayList<>();
+        //            values.add("Millennium");
+        //            ip.setPossibleValues(values);
+        //            ip.setRequired(true);
+        //            this.properties.add(ip);
+        //        }
 
     }
 
@@ -343,20 +341,20 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
     }
 
     private void generateProperties(ImportObject io) {
-        for (ImportProperty ip : this.properties) {
-            Processproperty pe = new Processproperty();
-            pe.setTitel(ip.getName());
-            pe.setContainer(ip.getContainer());
-            pe.setCreationDate(new Date());
-            pe.setIstObligatorisch(false);
-            if (ip.getType().equals(Type.LIST)) {
-                pe.setType(PropertyType.List);
-            } else if (ip.getType().equals(Type.TEXT)) {
-                pe.setType(PropertyType.String);
-            }
-            pe.setWert(ip.getValue());
-            io.getProcessProperties().add(pe);
-        }
+        //        for (ImportProperty ip : this.properties) {
+        //            Processproperty pe = new Processproperty();
+        //            pe.setTitel(ip.getName());
+        //            pe.setContainer(ip.getContainer());
+        //            pe.setCreationDate(new Date());
+        //            pe.setIstObligatorisch(false);
+        //            if (ip.getType().equals(Type.LIST)) {
+        //                pe.setType(PropertyType.List);
+        //            } else if (ip.getType().equals(Type.TEXT)) {
+        //                pe.setType(PropertyType.String);
+        //            }
+        //            pe.setWert(ip.getValue());
+        //            io.getProcessProperties().add(pe);
+        //        }
 
         {
             Processproperty pe = new Processproperty();
@@ -548,7 +546,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Override
     public List<ImportProperty> getProperties() {
-        return this.properties;
+        return null;
     }
 
     @Override
