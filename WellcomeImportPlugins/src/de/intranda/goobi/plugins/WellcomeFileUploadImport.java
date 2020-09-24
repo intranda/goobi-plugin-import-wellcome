@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -448,7 +449,16 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 Path tempFolder = Files.createTempDirectory("metadata");
                 extractZipFile(tempFolder);
 
-                List<Path> allExtractedFiles = StorageProvider.getInstance().listFiles(tempFolder.toString());
+                List<Path> allExtractedFiles = new ArrayList<>();
+
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(tempFolder)) {
+                    for (Path path : directoryStream) {
+                        allExtractedFiles.add(path);
+                    }
+                } catch (IOException ex) {
+                }
+                Collections.sort(allExtractedFiles);
+
                 for (Path path : allExtractedFiles) {
                     if (path.getFileName().toString().endsWith(".xml")) {
                         Record record = readFile(path.toFile());
@@ -473,7 +483,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
         ZipEntry zipEntry = zis.getNextEntry();
         while (zipEntry != null) {
-            Path extractedFile  = Paths.get(tempFolder.toString(), zipEntry.getName());
+            Path extractedFile = Paths.get(tempFolder.toString(), zipEntry.getName());
             OutputStream os = Files.newOutputStream(extractedFile);
             int len;
             while ((len = zis.read(buffer)) > 0) {
