@@ -5,14 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.goobi.beans.Processproperty;
@@ -36,7 +34,6 @@ import org.jdom2.transform.XSLTransformer;
 
 import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
-import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
@@ -614,7 +611,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         List<ImportType> answer = new ArrayList<>();
         answer.add(ImportType.Record);
         answer.add(ImportType.FILE);
-        answer.add(ImportType.FOLDER);
+        //        answer.add(ImportType.FOLDER);
 
         return answer;
     }
@@ -685,52 +682,17 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<String> getAllFilenames() {
-        List<String> answer = new ArrayList<>();
-        String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        File f = new File(folder);
-        if (f.exists() && f.isDirectory()) {
-            String[] files = f.list();
-            for (String file : files) {
-                answer.add(file);
-            }
-            Collections.sort(answer);
-        }
-        return answer;
+        return null;
     }
 
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-        String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        List<Record> records = new ArrayList<>();
-        for (String filename : filenames) {
-            File f = new File(folder, filename);
-            try {
-                Document doc = new SAXBuilder().build(f);
-                if (doc != null && doc.getRootElement() != null) {
-                    Record record = new Record();
-                    record.setId(filename);
-                    record.setData(new XMLOutputter().outputString(doc));
-                    records.add(record);
-                } else {
-                    logger.error("Could not parse '" + filename + "'.");
-                }
-            } catch (JDOMException e) {
-                logger.error(e.getMessage(), e);
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-
-        }
-        return records;
+        return null;
     }
 
     @Override
     public void deleteFiles(List<String> selectedFilenames) {
-        String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        for (String filename : selectedFilenames) {
-            File f = new File(folder, filename);
-            FileUtils.deleteQuietly(f);
-        }
+
     }
 
     @Override
