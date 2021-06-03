@@ -14,7 +14,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -134,9 +133,9 @@ public class WellcomeOpacImportPlugin implements IImportPluginVersion2, IPlugin 
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     String value = null;
-                    if (cell.getCellTypeEnum() == CellType.STRING) {
+                    if (cell.getCellType() == CellType.STRING) {
                         value = cell.getStringCellValue();
-                    } else if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                    } else if (cell.getCellType() == CellType.NUMERIC) {
                         value = Integer.toString((int) cell.getNumericCellValue());
                     }
                     if (value != null && value.matches(BNUMBER_REGEX)) {
@@ -153,8 +152,6 @@ public class WellcomeOpacImportPlugin implements IImportPluginVersion2, IPlugin 
         } catch (IOException e) {
             log.error(e);
         } catch (EncryptedDocumentException e) {
-            log.error(e);
-        } catch (InvalidFormatException e) {
             log.error(e);
         }
         return records;
