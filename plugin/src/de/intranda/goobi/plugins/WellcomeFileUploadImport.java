@@ -177,7 +177,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
             if (doc != null && doc.hasRootElement()) {
                 Element record = null;
                 Element root = doc.getRootElement();
-                if (root.getName().equals("record")) {
+                if ("record".equals(root.getName())) {
                     record = root;
                 } else {
                     record = doc.getRootElement().getChild("record", MARC);
@@ -187,10 +187,10 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 String value907a = "";
 
                 for (Element e907 : datafields) {
-                    if (e907.getAttributeValue("tag").equals("907")) {
+                    if ("907".equals(e907.getAttributeValue("tag"))) {
                         List<Element> subfields = e907.getChildren("subfield", MARC);
                         for (Element subfield : subfields) {
-                            if (subfield.getAttributeValue("code").equals("a")) {
+                            if ("a".equals(subfield.getAttributeValue("code"))) {
                                 value907a = subfield.getText().replace(".", "");
                             }
                         }
@@ -198,7 +198,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 }
                 boolean control001 = false;
                 for (Element e : controlfields) {
-                    if (e.getAttributeValue("tag").equals("001")) {
+                    if ("001".equals(e.getAttributeValue("tag"))) {
                         e.setText(value907a);
                         control001 = true;
                         break;
@@ -221,7 +221,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 ff.setDigitalDocument(dd);
 
                 Element eleMods = docMods.getRootElement();
-                if (eleMods.getName().equals("modsCollection")) {
+                if ("modsCollection".equals(eleMods.getName())) {
                     eleMods = eleMods.getChild("mods", null);
                 }
 
@@ -254,11 +254,11 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 //                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
                 currentIADownloadIdentifier = WellcomeUtils.getAIDownloadIdentifier(prefs, dsRoot);
                 // Add dummy volume to anchors
-                if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                if ("Periodical".equals(dsRoot.getType().getName()) || "MultiVolumeWork".equals(dsRoot.getType().getName())) {
                     DocStruct dsVolume = null;
-                    if (dsRoot.getType().getName().equals("Periodical")) {
+                    if ("Periodical".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("PeriodicalVolume"));
-                    } else if (dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                    } else if ("MultiVolumeWork".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("Volume"));
                     }
                     dsRoot.addChild(dsVolume);
@@ -316,22 +316,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException e) {
-            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (IOException e) {
-            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (PreferencesException e) {
-            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedForParentException e) {
-            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (MetadataTypeNotAllowedException e) {
-            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedAsChildException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
             log.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
@@ -361,14 +346,14 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
 
@@ -508,9 +493,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
             } else {
                 log.error("Could not parse '" + file.getAbsolutePath() + "'.");
             }
-        } catch (JDOMException e) {
-            log.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             log.error(e.getMessage(), e);
         }
 
