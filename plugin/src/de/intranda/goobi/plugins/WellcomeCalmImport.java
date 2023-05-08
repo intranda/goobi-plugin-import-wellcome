@@ -128,7 +128,6 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-
     public String getDescription() {
         return NAME;
     }
@@ -170,7 +169,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                 String dsType = dScribeRecord.getChild("RecordType").getText();
 
                 // TODO sicherstellen das alle dsType im Regelsatz existieren
-                if (!dsType.equals("Monograph")) {
+                if (!"Monograph".equals(dsType)) {
                     dsType = "Monograph";
                 }
                 DocStruct dsRoot = dd.createDocStruct(this.prefs.getDocStrctTypeByName(dsType));
@@ -202,10 +201,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                         } else {
                             toTest = sub;
                         }
-                    } else {
-                        if (dScribeRecord.getChild(key) != null) {
-                            toTest = dScribeRecord.getChild(key);
-                        }
+                    } else if (dScribeRecord.getChild(key) != null) {
+                        toTest = dScribeRecord.getChild(key);
                     }
 
                     if (toTest != null) {
@@ -217,7 +214,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                         Metadata md = new Metadata(mdt);
                         md.setValue(toTest.getText());
                         dsRoot.addMetadata(md);
-                        if (metadataName.equalsIgnoreCase("CatalogIDDigital")) {
+                        if ("CatalogIDDigital".equalsIgnoreCase(metadataName)) {
                             this.currentIdentifier = md.getValue();
                         }
                     }
@@ -265,19 +262,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             }
             File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
             WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_CALM.xml", doc);
-        } catch (JDOMException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            ff = null;
-        } catch (IOException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            ff = null;
-        } catch (PreferencesException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            ff = null;
-        } catch (TypeNotAllowedForParentException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            ff = null;
-        } catch (MetadataTypeNotAllowedException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException e) {
             logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
             ff = null;
         } catch (Exception e) {
@@ -364,10 +349,10 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             pe.setContainer(ip.getContainer());
             pe.setCreationDate(new Date());
             pe.setIstObligatorisch(false);
-            if (ip.getType().equals(Type.LIST)) {
-                pe.setType(PropertyType.List);
-            } else if (ip.getType().equals(Type.TEXT)) {
-                pe.setType(PropertyType.String);
+            if (Type.LIST.equals(ip.getType())) {
+                pe.setType(PropertyType.LIST);
+            } else if (Type.TEXT.equals(ip.getType())) {
+                pe.setType(PropertyType.STRING);
             }
             pe.setWert(ip.getValue());
             io.getProcessProperties().add(pe);
@@ -377,21 +362,21 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("AltRefNo");
             pe.setWert(this.altRefNo);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
 
@@ -421,9 +406,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
             } else {
                 logger.error("Could not parse '" + this.importFile + "'.");
             }
-        } catch (JDOMException e) {
-            logger.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             logger.error(e.getMessage(), e);
         }
         return ret;
@@ -540,9 +523,7 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
                 } else {
                     logger.error("Could not parse '" + filename + "'.");
                 }
-            } catch (JDOMException e) {
-                logger.error(e.getMessage(), e);
-            } catch (IOException e) {
+            } catch (JDOMException | IOException e) {
                 logger.error(e.getMessage(), e);
             }
 
@@ -594,7 +575,6 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         // TODO Auto-generated method stub
 
     }
-
 
     @Override
     public void setForm(MassImportForm form) {

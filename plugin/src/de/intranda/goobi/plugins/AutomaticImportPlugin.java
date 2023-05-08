@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -31,6 +29,13 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
+import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.enums.PropertyType;
+import de.sub.goobi.helper.exceptions.ImportPluginException;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
@@ -44,12 +49,7 @@ import ugh.exceptions.TypeNotAllowedAsChildException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-import de.intranda.goobi.plugins.utils.WellcomeUtils;
-import de.sub.goobi.config.ConfigPlugins;
-import de.sub.goobi.config.ConfigurationHelper;
-import de.sub.goobi.forms.MassImportForm;
-import de.sub.goobi.helper.enums.PropertyType;
-import de.sub.goobi.helper.exceptions.ImportPluginException;
+
 @PluginImplementation
 public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
@@ -58,14 +58,13 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     private static final Logger logger = Logger.getLogger(AutomaticImportPlugin.class);
 
-    private Map<String, String> map = new HashMap<String, String>();
+    private Map<String, String> map = new HashMap<>();
 
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
     private String currentIdentifier;
     private String currentWellcomeIdentifier;
-
 
     public AutomaticImportPlugin() {
         this.map.put("?Monographic", "Monograph");
@@ -101,7 +100,6 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
         return COMMAND_NAME;
     }
 
-    
     public String getDescription() {
         return COMMAND_NAME;
     }
@@ -128,7 +126,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
             if (doc != null && doc.hasRootElement()) {
                 Element record = null;
                 Element root = doc.getRootElement();
-                if (root.getName().equals("record")) {
+                if ("record".equals(root.getName())) {
                     record = root;
                 } else {
                     doc.getRootElement().getChild("record", MARC);
@@ -138,10 +136,10 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
                 String value907a = "";
 
                 for (Element e907 : datafields) {
-                    if (e907.getAttributeValue("tag").equals("907")) {
+                    if ("907".equals(e907.getAttributeValue("tag"))) {
                         List<Element> subfields = e907.getChildren("subfield", MARC);
                         for (Element subfield : subfields) {
-                            if (subfield.getAttributeValue("code").equals("a")) {
+                            if ("a".equals(subfield.getAttributeValue("code"))) {
                                 value907a = subfield.getText().replace(".", "");
                             }
                         }
@@ -149,7 +147,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
                 }
                 boolean control001 = false;
                 for (Element e : controlfields) {
-                    if (e.getAttributeValue("tag").equals("001")) {
+                    if ("001".equals(e.getAttributeValue("tag"))) {
                         e.setText(value907a);
                         control001 = true;
                         break;
@@ -172,7 +170,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
                 ff.setDigitalDocument(dd);
 
                 Element eleMods = docMods.getRootElement();
-                if (eleMods.getName().equals("modsCollection")) {
+                if ("modsCollection".equals(eleMods.getName())) {
                     eleMods = eleMods.getChild("mods", null);
                 }
 
@@ -203,11 +201,11 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
 
                 // Add dummy volume to anchors
-                if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                if ("Periodical".equals(dsRoot.getType().getName()) || "MultiVolumeWork".equals(dsRoot.getType().getName())) {
                     DocStruct dsVolume = null;
-                    if (dsRoot.getType().getName().equals("Periodical")) {
+                    if ("Periodical".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("PeriodicalVolume"));
-                    } else if (dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                    } else if ("MultiVolumeWork".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("Volume"));
                     }
                     dsRoot.addChild(dsVolume);
@@ -263,22 +261,8 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (IOException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (PreferencesException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedForParentException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (MetadataTypeNotAllowedException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedAsChildException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException
+                | TypeNotAllowedAsChildException e) {
             logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
@@ -306,7 +290,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<ImportObject> generateFiles(List<Record> recordList) {
-        List<ImportObject> answer = new ArrayList<ImportObject>();
+        List<ImportObject> answer = new ArrayList<>();
 
         for (Record record : recordList) {
             this.data = record.getData();
@@ -358,35 +342,35 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
 
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("CollectionName1");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             pe.setWert("Digitised");
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("CollectionName2");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             pe.setWert(COLLECTION_NAME);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("securityTag");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             pe.setWert("open");
             io.getProcessProperties().add(pe);
 
@@ -394,7 +378,7 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("schemaName");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             pe.setWert("Millennium");
             io.getProcessProperties().add(pe);
         }
@@ -407,17 +391,17 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<Record> splitRecords(String records) {
-        return new ArrayList<Record>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<Record> generateRecordsFromFile() {
-        return new ArrayList<Record>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-        return new ArrayList<Record>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -426,12 +410,12 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> splitIds(String ids) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<ImportType> getImportTypes() {
-        return new ArrayList<ImportType>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -482,10 +466,10 @@ public class AutomaticImportPlugin implements IImportPlugin, IPlugin {
     public void setDocstruct(DocstructElement dse) {
     }
 
-    
+    @Override
     public void setForm(MassImportForm form) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

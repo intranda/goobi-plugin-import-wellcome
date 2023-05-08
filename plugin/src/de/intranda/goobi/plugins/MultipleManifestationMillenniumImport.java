@@ -66,7 +66,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map_multi.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
 
-
     private Prefs prefs;
     private String data = "";
     private File importFile = null;
@@ -172,7 +171,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         return title;
     }
 
-
     public String getDescription() {
         return title;
     }
@@ -188,7 +186,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             if (doc != null && doc.hasRootElement()) {
                 Element root = doc.getRootElement();
                 Element record = null;
-                if (root.getName().equalsIgnoreCase("record")) {
+                if ("record".equalsIgnoreCase(root.getName())) {
                     record = root;
                 } else {
                     record = doc.getRootElement().getChild("record", MARC);
@@ -198,10 +196,10 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 String value907a = "";
 
                 for (Element e907 : datafields) {
-                    if (e907.getAttributeValue("tag").equals("907")) {
+                    if ("907".equals(e907.getAttributeValue("tag"))) {
                         List<Element> subfields = e907.getChildren("subfield", MARC);
                         for (Element subfield : subfields) {
-                            if (subfield.getAttributeValue("code").equals("a")) {
+                            if ("a".equals(subfield.getAttributeValue("code"))) {
                                 value907a = subfield.getText().replace(".", "");
                             }
                         }
@@ -209,7 +207,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 }
                 boolean control001 = false;
                 for (Element e : controlfields) {
-                    if (e.getAttributeValue("tag").equals("001")) {
+                    if ("001".equals(e.getAttributeValue("tag"))) {
                         e.setText(value907a);
                         control001 = true;
                         break;
@@ -232,7 +230,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 ff.setDigitalDocument(dd);
 
                 Element eleMods = docMods.getRootElement();
-                if (eleMods.getName().equals("modsCollection")) {
+                if ("modsCollection".equals(eleMods.getName())) {
                     eleMods = eleMods.getChild("mods", null);
                 }
 
@@ -279,21 +277,21 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
                 Metadata manifestationType = new Metadata(this.prefs.getMetadataTypeByName("_ManifestationType"));
                 for (ImportProperty ip : this.properties) {
-                    if (ip.getName().equals("Multiple manifestation type")) {
+                    if ("Multiple manifestation type".equals(ip.getName())) {
                         manifestationType.setValue(ip.getValue());
                         break;
                     }
                 }
                 dsRoot.addMetadata(manifestationType);
                 String copyvalue = docstruct.getCopyProperty().getValue();
-                if (!copyvalue.equals("N/A")) {
+                if (!"N/A".equals(copyvalue)) {
                     Metadata copyType = new Metadata(this.prefs.getMetadataTypeByName("_copy"));
                     copyType.setValue(copyvalue);
                     dsVolume.addMetadata(copyType);
                 }
 
                 String volumevalue = docstruct.getVolumeProperty().getValue();
-                if (!volumevalue.equals("N/A")) {
+                if (!"N/A".equals(volumevalue)) {
                     Metadata volumeType = new Metadata(this.prefs.getMetadataTypeByName("_volume"));
                     volumeType.setValue(volumevalue);
                     dsVolume.addMetadata(volumeType);
@@ -349,22 +347,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (IOException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (PreferencesException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedForParentException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (MetadataTypeNotAllowedException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedAsChildException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
             logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
@@ -377,16 +360,16 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     private void generateProperties(ImportObject io) {
         for (ImportProperty ip : this.properties) {
-            if (!ip.getName().equals("Multiple manifestation type")) {
+            if (!"Multiple manifestation type".equals(ip.getName())) {
                 Processproperty pe = new Processproperty();
                 pe.setTitel(ip.getName());
                 pe.setContainer(ip.getContainer());
                 pe.setCreationDate(new Date());
                 pe.setIstObligatorisch(false);
-                if (ip.getType().equals(Type.LIST)) {
-                    pe.setType(PropertyType.List);
-                } else if (ip.getType().equals(Type.TEXT)) {
-                    pe.setType(PropertyType.String);
+                if (Type.LIST.equals(ip.getType())) {
+                    pe.setType(PropertyType.LIST);
+                } else if (Type.TEXT.equals(ip.getType())) {
+                    pe.setType(PropertyType.STRING);
                 }
                 pe.setWert(ip.getValue());
                 io.getProcessProperties().add(pe);
@@ -397,14 +380,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
 
@@ -499,9 +482,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             } else {
                 logger.error("Could not parse '" + this.importFile + "'.");
             }
-        } catch (JDOMException e) {
-            logger.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             logger.error(e.getMessage(), e);
         }
         return ret;
@@ -654,8 +635,8 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                         str = str.substring(8);
                         Element eleDataField = new Element("datafield");
                         eleDataField.setAttribute("tag", tag);
-                        eleDataField.setAttribute("ind1", !ind1.equals("\\") ? ind1 : "");
-                        eleDataField.setAttribute("ind2", !ind2.equals("\\") ? ind2 : "");
+                        eleDataField.setAttribute("ind1", !"\\".equals(ind1) ? ind1 : "");
+                        eleDataField.setAttribute("ind2", !"\\".equals(ind2) ? ind2 : "");
                         Pattern p = Pattern.compile("[$]+[^$]+");
                         Matcher m = p.matcher(str);
                         while (m.find()) {
@@ -789,6 +770,5 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         }
         return true;
     }
-
 
 }

@@ -159,7 +159,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         return title;
     }
 
-
     public String getDescription() {
         return getTitle();
     }
@@ -175,7 +174,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
             if (doc != null && doc.hasRootElement()) {
                 Element record = null;
                 Element root = doc.getRootElement();
-                if (root.getName().equals("record")) {
+                if ("record".equals(root.getName())) {
                     record = root;
                 } else {
                     record = doc.getRootElement().getChild("record", MARC);
@@ -185,10 +184,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 String value907a = "";
 
                 for (Element e907 : datafields) {
-                    if (e907.getAttributeValue("tag").equals("907")) {
+                    if ("907".equals(e907.getAttributeValue("tag"))) {
                         List<Element> subfields = e907.getChildren("subfield", MARC);
                         for (Element subfield : subfields) {
-                            if (subfield.getAttributeValue("code").equals("a")) {
+                            if ("a".equals(subfield.getAttributeValue("code"))) {
                                 value907a = subfield.getText().replace(".", "");
                             }
                         }
@@ -196,7 +195,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 }
                 boolean control001 = false;
                 for (Element e : controlfields) {
-                    if (e.getAttributeValue("tag").equals("001")) {
+                    if ("001".equals(e.getAttributeValue("tag"))) {
                         e.setText(value907a);
                         control001 = true;
                         break;
@@ -219,7 +218,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 ff.setDigitalDocument(dd);
 
                 Element eleMods = docMods.getRootElement();
-                if (eleMods.getName().equals("modsCollection")) {
+                if ("modsCollection".equals(eleMods.getName())) {
                     eleMods = eleMods.getChild("mods", null);
                 }
 
@@ -252,11 +251,11 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 //                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
                 currentIADownloadIdentifier = WellcomeUtils.getAIDownloadIdentifier(prefs, dsRoot);
                 // Add dummy volume to anchors
-                if (dsRoot.getType().getName().equals("Periodical") || dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                if ("Periodical".equals(dsRoot.getType().getName()) || "MultiVolumeWork".equals(dsRoot.getType().getName())) {
                     DocStruct dsVolume = null;
-                    if (dsRoot.getType().getName().equals("Periodical")) {
+                    if ("Periodical".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("PeriodicalVolume"));
-                    } else if (dsRoot.getType().getName().equals("MultiVolumeWork")) {
+                    } else if ("MultiVolumeWork".equals(dsRoot.getType().getName())) {
                         dsVolume = dd.createDocStruct(this.prefs.getDocStrctTypeByName("Volume"));
                     }
                     dsRoot.addChild(dsVolume);
@@ -314,22 +313,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (IOException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (PreferencesException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedForParentException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (MetadataTypeNotAllowedException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
-            throw new ImportPluginException(e);
-        } catch (TypeNotAllowedAsChildException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
             logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
@@ -359,14 +343,14 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
 
@@ -447,9 +431,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
             } else {
                 logger.error("Could not parse '" + this.importFile + "'.");
             }
-        } catch (JDOMException e) {
-            logger.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             logger.error(e.getMessage(), e);
         }
         return ret;
@@ -602,8 +584,8 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                         str = str.substring(8);
                         Element eleDataField = new Element("datafield");
                         eleDataField.setAttribute("tag", tag);
-                        eleDataField.setAttribute("ind1", !ind1.equals("\\") ? ind1 : "");
-                        eleDataField.setAttribute("ind2", !ind2.equals("\\") ? ind2 : "");
+                        eleDataField.setAttribute("ind1", !"\\".equals(ind1) ? ind1 : "");
+                        eleDataField.setAttribute("ind2", !"\\".equals(ind2) ? ind2 : "");
                         Pattern p = Pattern.compile("[$]+[^$]+");
                         Matcher m = p.matcher(str);
                         while (m.find()) {
@@ -659,9 +641,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 } else {
                     logger.error("Could not parse '" + filename + "'.");
                 }
-            } catch (JDOMException e) {
-                logger.error(e.getMessage(), e);
-            } catch (IOException e) {
+            } catch (JDOMException | IOException e) {
                 logger.error(e.getMessage(), e);
             }
 
@@ -714,7 +694,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
     }
 
-
     @Override
     public void setForm(MassImportForm form) {
         this.form = form;
@@ -750,8 +729,5 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         }
         return true;
     }
-
-
-
 
 }

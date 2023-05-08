@@ -8,17 +8,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.goobi.production.importer.DocstructElement;
-import org.goobi.production.importer.ImportObject;
-import org.goobi.production.importer.Record;
+import org.goobi.beans.Processproperty;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
 import org.goobi.production.enums.PluginType;
+import org.goobi.production.importer.DocstructElement;
+import org.goobi.production.importer.ImportObject;
+import org.goobi.production.importer.Record;
 import org.goobi.production.plugin.interfaces.IImportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.properties.ImportProperty;
@@ -31,6 +30,14 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
+import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
+import de.intranda.goobi.plugins.utils.WellcomeUtils;
+import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.enums.PropertyType;
+import de.sub.goobi.helper.exceptions.ImportPluginException;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
@@ -44,16 +51,6 @@ import ugh.exceptions.TypeNotAllowedAsChildException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
-import de.intranda.goobi.plugins.utils.WellcomeUtils;
-
-import org.goobi.beans.Processproperty;
-
-import de.sub.goobi.config.ConfigPlugins;
-import de.sub.goobi.config.ConfigurationHelper;
-import de.sub.goobi.forms.MassImportForm;
-import de.sub.goobi.helper.enums.PropertyType;
-import de.sub.goobi.helper.exceptions.ImportPluginException;
 
 @PluginImplementation
 public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
@@ -78,7 +75,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
     private String currentWellcomeIdentifier;
     // private String currentWellcomeLeader6;
     // private String currentAuthor;
-    private List<ImportProperty> properties = new ArrayList<ImportProperty>();
+    private List<ImportProperty> properties = new ArrayList<>();
 
     //    private List<WellcomeDocstructElement> currentDocStructs = new ArrayList<WellcomeDocstructElement>();
     //    private WellcomeDocstructElement docstruct;
@@ -102,7 +99,6 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         return NAME;
     }
 
-    
     public String getDescription() {
         return NAME;
     }
@@ -119,7 +115,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
             if (doc != null && doc.hasRootElement()) {
                 Element root = doc.getRootElement();
                 Element record = null;
-                if (root.getName().equalsIgnoreCase("record")) {
+                if ("record".equalsIgnoreCase(root.getName())) {
                     record = root;
                 } else {
                     record = doc.getRootElement().getChild("record", MARC);
@@ -129,10 +125,10 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 String value907a = "";
 
                 for (Element e907 : datafields) {
-                    if (e907.getAttributeValue("tag").equals("907")) {
+                    if ("907".equals(e907.getAttributeValue("tag"))) {
                         List<Element> subfields = e907.getChildren("subfield", MARC);
                         for (Element subfield : subfields) {
-                            if (subfield.getAttributeValue("code").equals("a")) {
+                            if ("a".equals(subfield.getAttributeValue("code"))) {
                                 value907a = subfield.getText().replace(".", "");
                             }
                         }
@@ -140,7 +136,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 }
                 boolean control001 = false;
                 for (Element e : controlfields) {
-                    if (e.getAttributeValue("tag").equals("001")) {
+                    if ("001".equals(e.getAttributeValue("tag"))) {
                         e.setText(value907a);
                         control001 = true;
                         break;
@@ -163,7 +159,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 ff.setDigitalDocument(dd);
 
                 Element eleMods = docMods.getRootElement();
-                if (eleMods.getName().equals("modsCollection")) {
+                if ("modsCollection".equals(eleMods.getName())) {
                     eleMods = eleMods.getChild("mods", null);
                 }
 
@@ -184,7 +180,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
                 Metadata volumeType = new Metadata(this.prefs.getMetadataTypeByName("_volume"));
                 volumeType.setValue(order);
-                
+
                 // order zweistellig
                 int orderNo = Integer.parseInt(order);
                 if (orderNo < 10) {
@@ -233,9 +229,8 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
                 manifestationType.setValue("General");
 
-
                 dsVolume.addMetadata(volumeType);
-                
+
                 dsRoot.addMetadata(manifestationType);
 
                 // Add 'pathimagefiles'
@@ -297,16 +292,16 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     private void generateProperties(ImportObject io) {
         for (ImportProperty ip : this.properties) {
-            if (!ip.getName().equals("Multiple manifestation type")) {
+            if (!"Multiple manifestation type".equals(ip.getName())) {
                 Processproperty pe = new Processproperty();
                 pe.setTitel(ip.getName());
                 pe.setContainer(ip.getContainer());
                 pe.setCreationDate(new Date());
                 pe.setIstObligatorisch(false);
-                if (ip.getType().equals(Type.LIST)) {
-                    pe.setType(PropertyType.List);
-                } else if (ip.getType().equals(Type.TEXT)) {
-                    pe.setType(PropertyType.String);
+                if (Type.LIST.equals(ip.getType())) {
+                    pe.setType(PropertyType.LIST);
+                } else if (Type.TEXT.equals(ip.getType())) {
+                    pe.setType(PropertyType.LIST);
                 }
                 pe.setWert(ip.getValue());
                 io.getProcessProperties().add(pe);
@@ -317,31 +312,30 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
             Processproperty pe = new Processproperty();
             pe.setTitel("importPlugin");
             pe.setWert(getTitle());
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("b-number");
             pe.setWert(currentRecord.getId().replace(".xml", "").replace("_marc", ""));
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("CollectionName1");
             pe.setWert("Digitised");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
         {
             Processproperty pe = new Processproperty();
             pe.setTitel("schemaName");
             pe.setWert("Millennium");
-            pe.setType(PropertyType.String);
+            pe.setType(PropertyType.STRING);
             io.getProcessProperties().add(pe);
         }
-
 
         //		{
         //			Prozesseigenschaft pe = new Prozesseigenschaft();
@@ -354,7 +348,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<ImportObject> generateFiles(List<Record> records) {
-        List<ImportObject> answer = new ArrayList<ImportObject>();
+        List<ImportObject> answer = new ArrayList<>();
 
         if (records.size() > 0) {
             for (Record r : records) {
@@ -411,7 +405,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<Record> generateRecordsFromFile() {
-        //       
+        //
         return null;
     }
 
@@ -423,7 +417,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> splitIds(String ids) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -466,7 +460,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
     @Override
     public List<ImportType> getImportTypes() {
         // TODO  return new ArrayList<ImportType>();
-        List<ImportType> answer = new ArrayList<ImportType>();
+        List<ImportType> answer = new ArrayList<>();
         answer.add(ImportType.FOLDER);
         return answer;
     }
@@ -478,7 +472,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
 
     @Override
     public List<String> getAllFilenames() {
-        List<String> answer = new ArrayList<String>();
+        List<String> answer = new ArrayList<>();
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
         File f = new File(folder);
         if (f.exists() && f.isDirectory()) {
@@ -494,7 +488,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
         String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         for (String filename : filenames) {
             File f = new File(folder, filename);
             try {
@@ -507,9 +501,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 } else {
                     logger.error("Could not parse '" + filename + "'.");
                 }
-            } catch (JDOMException e) {
-                logger.error(e.getMessage(), e);
-            } catch (IOException e) {
+            } catch (JDOMException | IOException e) {
                 logger.error(e.getMessage(), e);
             }
 
@@ -561,9 +553,9 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
     public void setDocstruct(WellcomeDocstructElement dse) {
     }
 
-    
+    @Override
     public void setForm(MassImportForm form) {
         // TODO Auto-generated method stub
-        
+
     }
 }
