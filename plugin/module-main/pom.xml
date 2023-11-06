@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.intranda.goobi.plugins.import</groupId>
   <artifactId>wellcome-main</artifactId>
-  <version>23.08</version>
+  <version>23.10</version>
   <properties>
     <jar.name>plugin_intranda_import_wellcome</jar.name>
     <dest.folder>/opt/digiverso/goobi/plugins/import/</dest.folder>
@@ -12,7 +12,7 @@
   <parent>
     <groupId>de.intranda.goobi.plugins.import</groupId>
     <artifactId>wellcome</artifactId>
-    <version>23.08</version>
+    <version>23.10</version>
   </parent>
   <repositories>
     <repository>
