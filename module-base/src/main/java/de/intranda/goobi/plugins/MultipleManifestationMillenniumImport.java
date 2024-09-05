@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.goobi.beans.Processproperty;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
@@ -38,6 +37,7 @@ import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
+import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
@@ -53,15 +53,13 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 
+@Log4j2
 @PluginImplementation
 public class MultipleManifestationMillenniumImport implements IImportPlugin, IPlugin {
 
-    /** Logger for this class. */
-    private static final Logger logger = Logger.getLogger(MultipleManifestationMillenniumImport.class);
-
+    private static final long serialVersionUID = -7999981700008316227L;
     private String title = "Multiple Manifestation Millennium Import";
-    //	private static final String ID = "MultipleManifestationMillenniumImport";
-    // private static final String VERSION = "0.1";
+
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map_multi.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
@@ -71,15 +69,14 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     private File importFile = null;
     private String importFolder = "C:/Goobi/";
     private String currentIdentifier;
-    // private String currentTitle;
+
     private String currentWellcomeIdentifier;
-    // private String currentWellcomeLeader6;
-    // private String currentAuthor;
+
     private List<String> currentCollectionList;
-    private List<ImportProperty> properties = new ArrayList<>();
-    private List<WellcomeDocstructElement> currentDocStructs = new ArrayList<>();
-    private WellcomeDocstructElement docstruct;
-    private HashMap<String, String> structType = new HashMap<>();;
+    private transient List<ImportProperty> properties = new ArrayList<>();
+    private transient List<WellcomeDocstructElement> currentDocStructs = new ArrayList<>();
+    private transient WellcomeDocstructElement docstruct;
+    private HashMap<String, String> structType = new HashMap<>();
 
     private MassImportForm form;
 
@@ -100,65 +97,54 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         structType.put("Report", "PDFReport");
         structType.put("Annex", "PDFAnnex");
 
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("CollectionName1");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("Digitised");
-            values.add("Born digital");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("CollectionName2");
-            ip.setType(Type.TEXT);
-            ip.setRequired(false);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("securityTag");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("open");
-            values.add("closed");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("schemaName");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("Millennium");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
+        ImportProperty ip = new ImportProperty();
+        ip.setName("CollectionName1");
+        ip.setType(Type.LIST);
+        List<String> values = new ArrayList<>();
+        values.add("Digitised");
+        values.add("Born digital");
+        ip.setPossibleValues(values);
+        ip.setRequired(true);
+        this.properties.add(ip);
 
-        {
-            ImportProperty ip = new ImportProperty();
-            ip.setName("Multiple manifestation type");
-            ip.setType(Type.LIST);
-            List<String> values = new ArrayList<>();
-            values.add("General");
-            values.add("Video & transcript & poster image");
-            values.add("Video & transcript");
-            values.add("Audio & transcript");
-            values.add("Audio & transcript & poster image");
-            ip.setPossibleValues(values);
-            ip.setRequired(true);
-            this.properties.add(ip);
-        }
+        ImportProperty ip2 = new ImportProperty();
+        ip2.setName("CollectionName2");
+        ip2.setType(Type.TEXT);
+        ip2.setRequired(false);
+        this.properties.add(ip2);
 
-    }
+        ImportProperty ip3 = new ImportProperty();
+        ip3.setName("securityTag");
+        ip3.setType(Type.LIST);
+        values = new ArrayList<>();
+        values.add("open");
+        values.add("closed");
+        ip3.setPossibleValues(values);
+        ip3.setRequired(true);
+        this.properties.add(ip3);
 
-    public String getId() {
-        return title;
+        ImportProperty ip4 = new ImportProperty();
+        ip4.setName("schemaName");
+        ip4.setType(Type.LIST);
+        values = new ArrayList<>();
+        values.add("Millennium");
+        ip4.setPossibleValues(values);
+        ip4.setRequired(true);
+        this.properties.add(ip4);
+
+        ImportProperty ip5 = new ImportProperty();
+        ip5.setName("Multiple manifestation type");
+        ip5.setType(Type.LIST);
+        values = new ArrayList<>();
+        values.add("General");
+        values.add("Video & transcript & poster image");
+        values.add("Video & transcript");
+        values.add("Audio & transcript");
+        values.add("Audio & transcript & poster image");
+        ip5.setPossibleValues(values);
+        ip5.setRequired(true);
+        this.properties.add(ip5);
+
     }
 
     @Override
@@ -171,28 +157,23 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         return title;
     }
 
-    public String getDescription() {
-        return title;
-    }
-
     @Override
     public Fileformat convertData() throws ImportPluginException {
         Fileformat ff = null;
         Document doc;
         try {
-            // System.out.println(this.data);
 
             doc = new SAXBuilder().build(new StringReader(this.data));
             if (doc != null && doc.hasRootElement()) {
                 Element root = doc.getRootElement();
-                Element record = null;
+                Element rec = null;
                 if ("record".equalsIgnoreCase(root.getName())) {
-                    record = root;
+                    rec = root;
                 } else {
-                    record = doc.getRootElement().getChild("record", MARC);
+                    rec = doc.getRootElement().getChild("record", MARC);
                 }
-                List<Element> controlfields = record.getChildren("controlfield", MARC);
-                List<Element> datafields = record.getChildren("datafield", MARC);
+                List<Element> controlfields = rec.getChildren("controlfield", MARC);
+                List<Element> datafields = rec.getChildren("datafield", MARC);
                 String value907a = "";
 
                 for (Element e907 : datafields) {
@@ -217,13 +198,13 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                     Element controlfield001 = new Element("controlfield", MARC);
                     controlfield001.setAttribute("tag", "001");
                     controlfield001.setText(value907a);
-                    record.addContent(controlfield001);
+                    rec.addContent(controlfield001);
                 }
 
                 XSLTransformer transformer = new XSLTransformer(XSLT);
 
                 Document docMods = transformer.transform(doc);
-                logger.debug(new XMLOutputter().outputString(docMods));
+                log.debug(new XMLOutputter().outputString(docMods));
 
                 ff = new MetsMods(this.prefs);
                 DigitalDocument dd = new DigitalDocument();
@@ -237,7 +218,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 // Determine the root docstruct type
                 String dsType = "MultipleManifestation";
                 String volumeStructType = structType.get(docstruct.getDocStruct());
-                logger.debug("Docstruct type: " + dsType);
+                log.debug("Docstruct type: " + dsType);
 
                 DocStruct dsRoot = dd.createDocStruct(this.prefs.getDocStrctTypeByName(dsType));
                 dd.setLogicalDocStruct(dsRoot);
@@ -251,11 +232,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 WellcomeUtils.parseModsSectionForMultivolumes(MODS_MAPPING_FILE, this.prefs, dsRoot, dsVolume, dsBoundBook, eleMods);
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-                // this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                // this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
-                // this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
-
-                // TODO add year
 
                 String strId = String.valueOf(docstruct.getOrder());
                 if (docstruct.getOrder() < 10) {
@@ -271,9 +247,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 Metadata currentNo = new Metadata(this.prefs.getMetadataTypeByName("CurrentNo"));
                 currentNo.setValue(String.valueOf(docstruct.getOrder()));
                 dsVolume.addMetadata(currentNo);
-                Metadata CurrentNoSorting = new Metadata(this.prefs.getMetadataTypeByName("CurrentNoSorting"));
-                CurrentNoSorting.setValue(String.valueOf(docstruct.getOrder()));
-                dsVolume.addMetadata(CurrentNoSorting);
+                Metadata currentNoSorting = new Metadata(this.prefs.getMetadataTypeByName("CurrentNoSorting"));
+                currentNoSorting.setValue(String.valueOf(docstruct.getOrder()));
+                dsVolume.addMetadata(currentNoSorting);
 
                 Metadata manifestationType = new Metadata(this.prefs.getMetadataTypeByName("_ManifestationType"));
                 for (ImportProperty ip : this.properties) {
@@ -304,9 +280,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                     mdForPath.setValue("./" + this.currentIdentifier);
                     dsBoundBook.addMetadata(mdForPath);
                 } catch (MetadataTypeNotAllowedException e1) {
-                    logger.error("MetadataTypeNotAllowedException while reading images", e1);
+                    log.error("MetadataTypeNotAllowedException while reading images", e1);
                 } catch (DocStructHasNoTypeException e1) {
-                    logger.error("DocStructHasNoTypeException while reading images", e1);
+                    log.error("DocStructHasNoTypeException while reading images", e1);
                 }
 
                 // Add collection names attached to the current record
@@ -322,24 +298,24 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 dateDigitization.setValue("2012");
                 Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
                 placeOfElectronicOrigin.setValue("Wellcome Trust");
-                Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
-                _electronicEdition.setValue("[Electronic ed.]");
-                Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
-                _electronicPublisher.setValue("Wellcome Trust");
-                Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-                _digitalOrigin.setValue("reformatted digital");
+                Metadata electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
+                electronicEdition.setValue("[Electronic ed.]");
+                Metadata electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
+                electronicPublisher.setValue("Wellcome Trust");
+                Metadata digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+                digitalOrigin.setValue("reformatted digital");
                 if (dsRoot.getType().isAnchor()) {
                     DocStruct ds = dsRoot.getAllChildren().get(0);
                     ds.addMetadata(dateDigitization);
-                    ds.addMetadata(_electronicEdition);
+                    ds.addMetadata(electronicEdition);
 
                 } else {
                     dsRoot.addMetadata(dateDigitization);
-                    dsRoot.addMetadata(_electronicEdition);
+                    dsRoot.addMetadata(electronicEdition);
                 }
                 dsRoot.addMetadata(placeOfElectronicOrigin);
-                dsRoot.addMetadata(_electronicPublisher);
-                dsRoot.addMetadata(_digitalOrigin);
+                dsRoot.addMetadata(electronicPublisher);
+                dsRoot.addMetadata(digitalOrigin);
 
                 Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
                 physicalLocation.setValue("Wellcome Trust");
@@ -347,11 +323,12 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException
+                | TypeNotAllowedAsChildException e) {
+            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new ImportPluginException(e);
         }
 
@@ -376,28 +353,17 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
             }
         }
 
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("importPlugin");
-            pe.setWert(getTitle());
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("b-number");
-            pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
+        Processproperty pe = new Processproperty();
+        pe.setTitel("importPlugin");
+        pe.setWert(getTitle());
+        pe.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe);
 
-        //		{
-        //			Prozesseigenschaft pe = new Prozesseigenschaft();
-        //			pe.setTitel("CatalogueURL");
-        //			pe.setWert("http://catalogue.example.com/db/3/?id=" + this.currentIdentifier);
-        //			pe.setType(PropertyType.String);
-        //			io.getProcessProperties().add(pe);
-        //		}
+        Processproperty pe2 = new Processproperty();
+        pe2.setTitel("b-number");
+        pe2.setWert(this.currentIdentifier);
+        pe2.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe2);
     }
 
     @Override
@@ -409,7 +375,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     public List<ImportObject> generateFiles(List<Record> records) {
         List<ImportObject> answer = new ArrayList<>();
 
-        if (records.size() > 0) {
+        if (!records.isEmpty()) {
             Record r = records.get(0);
             this.data = r.getData();
             this.currentCollectionList = r.getCollections();
@@ -436,29 +402,21 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                         MetsMods mm = new MetsMods(this.prefs);
                         mm.setDigitalDocument(ff.getDigitalDocument());
                         String fileName = getImportFolder() + getProcessTitle() + ".xml";
-                        logger.debug("Writing '" + fileName + "' into given folder...");
+                        log.debug("Writing '" + fileName + "' into given folder...");
                         mm.write(fileName);
                         io.setMetsFilename(fileName);
                         io.setImportReturnValue(ImportReturnValue.ExportFinished);
-                        // ret.put(getProcessTitle(),
-                        // ImportReturnValue.ExportFinished);
                     } catch (PreferencesException e) {
-                        logger.error(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                         io.setErrorMessage(e.getMessage());
                         io.setImportReturnValue(ImportReturnValue.InvalidData);
-                        // ret.put(getProcessTitle(),
-                        // ImportReturnValue.InvalidData);
                     } catch (WriteException e) {
-                        logger.error(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                         io.setImportReturnValue(ImportReturnValue.WriteError);
                         io.setErrorMessage(e.getMessage());
-                        // ret.put(getProcessTitle(),
-                        // ImportReturnValue.WriteError);
                     }
                 } else {
                     io.setImportReturnValue(ImportReturnValue.InvalidData);
-                    // ret.put(getProcessTitle(),
-                    // ImportReturnValue.InvalidData);
                 }
                 answer.add(io);
             }
@@ -469,21 +427,18 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     @Override
     public List<Record> generateRecordsFromFile() {
         List<Record> ret = new ArrayList<>();
-        // InputStream input = null;
         try {
             Document doc = new SAXBuilder().build(this.importFile);
             if (doc != null && doc.getRootElement() != null) {
-                Record record = new Record();
-                record.setData(new XMLOutputter().outputString(doc));
-                // record.setData(new
-                // XMLOutputter().outputString(doc).replace("marc:", ""));
-                ret.add(record);
+                Record rec = new Record();
+                rec.setData(new XMLOutputter().outputString(doc));
+                ret.add(rec);
 
             } else {
-                logger.error("Could not parse '" + this.importFile + "'.");
+                log.error("Could not parse '" + this.importFile + "'.");
             }
         } catch (JDOMException | IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return ret;
     }
@@ -514,21 +469,20 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 recordStrings.add(sb.toString());
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         // Convert strings to MARCXML records and add them to Record objects
         for (String s : recordStrings) {
-            String data;
             try {
-                data = convertTextToMarcXml(s);
-                if (data != null) {
+                String d = convertTextToMarcXml(s);
+                if (d != null) {
                     Record rec = new Record();
-                    rec.setData(data);
+                    rec.setData(d);
                     ret.add(rec);
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
 
@@ -592,8 +546,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         List<ImportType> answer = new ArrayList<>();
         answer.add(ImportType.Record);
         answer.add(ImportType.FILE);
-        //        answer.add(ImportType.FOLDER);
-
         return answer;
     }
 
@@ -663,17 +615,17 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<String> getAllFilenames() {
-        return null;
+        return null; //NOSONAR
     }
 
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
-        return null;
+        return null; //NOSONAR
     }
 
     @Override
     public void deleteFiles(List<String> selectedFilenames) {
-
+        // nothing
     }
 
     @Override
@@ -699,7 +651,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
 
     @Override
     public List<? extends DocstructElement> getCurrentDocStructs() {
-        if (currentDocStructs.size() == 0) {
+        if (currentDocStructs.isEmpty()) {
             WellcomeDocstructElement dse = new WellcomeDocstructElement("Monograph", 1);
             currentDocStructs.add(dse);
         }

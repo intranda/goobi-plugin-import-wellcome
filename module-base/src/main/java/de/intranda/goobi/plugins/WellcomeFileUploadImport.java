@@ -2,7 +2,6 @@ package de.intranda.goobi.plugins;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -45,7 +44,7 @@ import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
@@ -63,10 +62,11 @@ import ugh.fileformats.mets.MetsMods;
 
 @PluginImplementation
 
-@Log4j
+@Log4j2
 public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin {
 
-    // private static final String VERSION = "0.1";
+    private static final long serialVersionUID = -288083231750979912L;
+
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
@@ -77,7 +77,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Getter
     @Setter
-    private Record data;
+    private transient Record data;
     @Getter
     @Setter
     private File file = null;
@@ -86,15 +86,13 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
     private String importFolder;
     private Map<String, String> map = new HashMap<>();
     private String currentIdentifier;
-    //    private String currentTitle;
+
     private String currentWellcomeIdentifier;
-    //    private String currentWellcomeLeader6;
-    //    private String currentAuthor;
+
     private List<String> currentCollectionList;
 
     // add IA download identifier
     private String currentIADownloadIdentifier;
-    //    private List<ImportProperty> properties = new ArrayList<>();
 
     @Setter
     private MassImportForm form;
@@ -123,47 +121,6 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         this.map.put("?Three-dimensional artefact or naturally occurring object", "3DObject");
         this.map.put("?Manuscript language material", "Archive");
         this.map.put("?BoundManuscript", "BoundManuscript");
-
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("CollectionName1");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("Digitised");
-        //            values.add("Born digital");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("CollectionName2");
-        //            ip.setType(Type.TEXT);
-        //            ip.setRequired(false);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("securityTag");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("open");
-        //            values.add("closed");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("schemaName");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("Millennium");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-
     }
 
     @Override
@@ -171,19 +128,18 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         Fileformat ff = null;
         Document doc;
         try {
-            // System.out.println(this.data);
 
             doc = new SAXBuilder().build(new StringReader(data.getData()));
             if (doc != null && doc.hasRootElement()) {
-                Element record = null;
+                Element rec = null;
                 Element root = doc.getRootElement();
                 if ("record".equals(root.getName())) {
-                    record = root;
+                    rec = root;
                 } else {
-                    record = doc.getRootElement().getChild("record", MARC);
+                    rec = doc.getRootElement().getChild("record", MARC);
                 }
-                List<Element> controlfields = record.getChildren("controlfield", MARC);
-                List<Element> datafields = record.getChildren("datafield", MARC);
+                List<Element> controlfields = rec.getChildren("controlfield", MARC);
+                List<Element> datafields = rec.getChildren("datafield", MARC);
                 String value907a = "";
 
                 for (Element e907 : datafields) {
@@ -208,7 +164,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                     Element controlfield001 = new Element("controlfield", MARC);
                     controlfield001.setAttribute("tag", "001");
                     controlfield001.setText(value907a);
-                    record.addContent(controlfield001);
+                    rec.addContent(controlfield001);
                 }
 
                 XSLTransformer transformer = new XSLTransformer(XSLT);
@@ -248,10 +204,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSection(MODS_MAPPING_FILE, this.prefs, dsRoot, dsBoundBook, eleMods);
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
-                //                this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                //                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-                //                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
                 currentIADownloadIdentifier = WellcomeUtils.getAIDownloadIdentifier(prefs, dsRoot);
                 // Add dummy volume to anchors
                 if ("Periodical".equals(dsRoot.getType().getName()) || "MultiVolumeWork".equals(dsRoot.getType().getName())) {
@@ -291,24 +244,24 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 dateDigitization.setValue("2012");
                 Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
                 placeOfElectronicOrigin.setValue("Wellcome Trust");
-                Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
-                _electronicEdition.setValue("[Electronic ed.]");
-                Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
-                _electronicPublisher.setValue("Wellcome Trust");
-                Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-                _digitalOrigin.setValue("reformatted digital");
+                Metadata electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
+                electronicEdition.setValue("[Electronic ed.]");
+                Metadata electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
+                electronicPublisher.setValue("Wellcome Trust");
+                Metadata digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+                digitalOrigin.setValue("reformatted digital");
                 if (dsRoot.getType().isAnchor()) {
                     DocStruct ds = dsRoot.getAllChildren().get(0);
                     ds.addMetadata(dateDigitization);
-                    ds.addMetadata(_electronicEdition);
+                    ds.addMetadata(electronicEdition);
 
                 } else {
                     dsRoot.addMetadata(dateDigitization);
-                    dsRoot.addMetadata(_electronicEdition);
+                    dsRoot.addMetadata(electronicEdition);
                 }
                 dsRoot.addMetadata(placeOfElectronicOrigin);
-                dsRoot.addMetadata(_electronicPublisher);
-                dsRoot.addMetadata(_digitalOrigin);
+                dsRoot.addMetadata(electronicPublisher);
+                dsRoot.addMetadata(digitalOrigin);
 
                 Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
                 physicalLocation.setValue("Wellcome Trust");
@@ -316,7 +269,8 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException
+                | TypeNotAllowedAsChildException e) {
             log.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
@@ -327,43 +281,18 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
     }
 
     private void generateProperties(ImportObject io) {
-        //        for (ImportProperty ip : this.properties) {
-        //            Processproperty pe = new Processproperty();
-        //            pe.setTitel(ip.getName());
-        //            pe.setContainer(ip.getContainer());
-        //            pe.setCreationDate(new Date());
-        //            pe.setIstObligatorisch(false);
-        //            if (ip.getType().equals(Type.LIST)) {
-        //                pe.setType(PropertyType.List);
-        //            } else if (ip.getType().equals(Type.TEXT)) {
-        //                pe.setType(PropertyType.String);
-        //            }
-        //            pe.setWert(ip.getValue());
-        //            io.getProcessProperties().add(pe);
-        //        }
 
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("importPlugin");
-            pe.setWert(getTitle());
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("b-number");
-            pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
+        Processproperty pe = new Processproperty();
+        pe.setTitel("importPlugin");
+        pe.setWert(getTitle());
+        pe.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe);
 
-        //		{
-        //			Prozesseigenschaft pe = new Prozesseigenschaft();
-        //			pe.setTitel("CatalogueURL");
-        //			pe.setWert("http://catalogue.example.com/db/3/?id=" + this.currentIdentifier);
-        //			pe.setType(PropertyType.String);
-        //			io.getProcessProperties().add(pe);
-        //		}
+        Processproperty pe2 = new Processproperty();
+        pe2.setTitel("b-number");
+        pe2.setWert(this.currentIdentifier);
+        pe2.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe2);
     }
 
     @Override
@@ -397,21 +326,21 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                     mm.write(fileName);
                     io.setMetsFilename(fileName);
                     io.setImportReturnValue(ImportReturnValue.ExportFinished);
-                    // ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
+
                 } catch (PreferencesException e) {
                     log.error(e.getMessage(), e);
                     io.setErrorMessage(e.getMessage());
                     io.setImportReturnValue(ImportReturnValue.InvalidData);
-                    // ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+
                 } catch (WriteException e) {
                     log.error(e.getMessage(), e);
                     io.setImportReturnValue(ImportReturnValue.WriteError);
                     io.setErrorMessage(e.getMessage());
-                    // ret.put(getProcessTitle(), ImportReturnValue.WriteError);
+
                 }
             } else {
                 io.setImportReturnValue(ImportReturnValue.InvalidData);
-                // ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
+
             }
             answer.add(io);
         }
@@ -424,9 +353,9 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         List<Record> answer = new ArrayList<>();
         if (file.getName().endsWith(".xml")) {
             // marc file, import single record
-            Record record = readFile(file);
-            if (record != null) {
-                answer.add(record);
+            Record rec = readFile(file);
+            if (rec != null) {
+                answer.add(rec);
             }
         } else if (file.getName().endsWith(".zip")) {
             // zip file, extract it and handle xml files as marc file
@@ -446,9 +375,9 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
                 for (Path path : allExtractedFiles) {
                     if (path.getFileName().toString().endsWith(".xml")) {
-                        Record record = readFile(path.toFile());
-                        if (record != null) {
-                            answer.add(record);
+                        Record rec = readFile(path.toFile());
+                        if (rec != null) {
+                            answer.add(rec);
                         }
                     }
                 }
@@ -463,32 +392,32 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         return answer;
     }
 
-    private void extractZipFile(Path tempFolder) throws FileNotFoundException, IOException {
+    private void extractZipFile(Path tempFolder) throws IOException {
         byte[] buffer = new byte[1024];
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
-        ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-            Path extractedFile = Paths.get(tempFolder.toString(), zipEntry.getName());
-            OutputStream os = Files.newOutputStream(extractedFile);
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-                os.write(buffer, 0, len);
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                Path extractedFile = Paths.get(tempFolder.toString(), zipEntry.getName());
+                try (OutputStream os = Files.newOutputStream(extractedFile)) {
+                    int len;
+                    while ((len = zis.read(buffer)) > 0) {
+                        os.write(buffer, 0, len);
+                    }
+                }
+                zipEntry = zis.getNextEntry();
             }
-            os.close();
-            zipEntry = zis.getNextEntry();
+            zis.closeEntry();
         }
-        zis.closeEntry();
-        zis.close();
     }
 
     private Record readFile(File file) {
         try {
             Document doc = new SAXBuilder().build(file);
             if (doc != null && doc.getRootElement() != null) {
-                Record record = new Record();
-                record.setId(file.getName());
-                record.setData(new XMLOutputter().outputString(doc));
-                return record;
+                Record rec = new Record();
+                rec.setId(file.getName());
+                rec.setData(new XMLOutputter().outputString(doc));
+                return rec;
 
             } else {
                 log.error("Could not parse '" + file.getAbsolutePath() + "'.");
@@ -512,9 +441,6 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Override
     public String getProcessTitle() {
-        // if (StringUtils.isNotBlank(this.currentTitle)) {
-        // return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
-        // }
         String returnvalue = "";
         if (currentIADownloadIdentifier != null) {
             returnvalue = currentIADownloadIdentifier.replaceAll("\\W", "_") + "_";
@@ -539,7 +465,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Override
     public List<ImportProperty> getProperties() {
-        return null;
+        return null; //NOSONAR
     }
 
     @Override
@@ -550,32 +476,11 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
     @Override
     public List<Record> generateRecordsFromFilenames(List<String> filenames) {
         return Collections.emptyList();
-        //        String folder = ConfigPlugins.getPluginConfig(this).getString("importFolder", "/opt/digiverso/goobi/import/");
-        //        List<Record> records = new ArrayList<>();
-        //        for (String filename : filenames) {
-        //            File f = new File(folder, filename);
-        //            try {
-        //                Document doc = new SAXBuilder().build(f);
-        //                if (doc != null && doc.getRootElement() != null) {
-        //                    Record record = new Record();
-        //                    record.setId(filename);
-        //                    record.setData(new XMLOutputter().outputString(doc));
-        //                    records.add(record);
-        //                } else {
-        //                    log.error("Could not parse '" + filename + "'.");
-        //                }
-        //            } catch (JDOMException e) {
-        //                log.error(e.getMessage(), e);
-        //            } catch (IOException e) {
-        //                log.error(e.getMessage(), e);
-        //            }
-        //
-        //        }
-        //        return records;
     }
 
     @Override
     public void deleteFiles(List<String> selectedFilenames) {
+        // nothing
     }
 
     @Override
@@ -590,12 +495,12 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Override
     public List<DocstructElement> getCurrentDocStructs() {
-        return null;
+        return null; //NOSONAR
     }
 
     @Override
     public List<String> getPossibleDocstructs() {
-        return null;
+        return null; //NOSONAR
     }
 
     @Override
@@ -605,6 +510,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     @Override
     public void setDocstruct(DocstructElement dse) {
+        //nothing
     }
 
     @Override

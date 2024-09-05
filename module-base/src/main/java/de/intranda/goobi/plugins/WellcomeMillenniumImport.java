@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.goobi.beans.Processproperty;
 import org.goobi.production.enums.ImportReturnValue;
 import org.goobi.production.enums.ImportType;
@@ -39,6 +38,7 @@ import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
+import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
@@ -55,13 +55,13 @@ import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 
 @PluginImplementation
+@Log4j2
 public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
-    /** Logger for this class. */
-    private static final Logger logger = Logger.getLogger(WellcomeMillenniumImport.class);
+    private static final long serialVersionUID = -5051232101802382789L;
 
     private String title = "Millennium Import";
-    // private static final String VERSION = "0.1";
+
     private static final String XSLT = ConfigurationHelper.getInstance().getXsltFolder() + "MARC21slim2MODS3.xsl";
     private static final String MODS_MAPPING_FILE = ConfigurationHelper.getInstance().getXsltFolder() + "mods_map.xml";
     private static final Namespace MARC = Namespace.getNamespace("marc", "http://www.loc.gov/MARC21/slim");
@@ -72,15 +72,13 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     private String importFolder = "C:/Goobi/";
     private Map<String, String> map = new HashMap<>();
     private String currentIdentifier;
-    //    private String currentTitle;
+
     private String currentWellcomeIdentifier;
-    //    private String currentWellcomeLeader6;
-    //    private String currentAuthor;
+
     private List<String> currentCollectionList;
 
     // add IA download identifier
     private String currentIADownloadIdentifier;
-    //    private List<ImportProperty> properties = new ArrayList<>();
 
     private MassImportForm form;
 
@@ -102,47 +100,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         this.map.put("?Three-dimensional artefact or naturally occurring object", "3DObject");
         this.map.put("?Manuscript language material", "Archive");
         this.map.put("?BoundManuscript", "BoundManuscript");
-
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("CollectionName1");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("Digitised");
-        //            values.add("Born digital");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("CollectionName2");
-        //            ip.setType(Type.TEXT);
-        //            ip.setRequired(false);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("securityTag");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("open");
-        //            values.add("closed");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-        //        {
-        //            ImportProperty ip = new ImportProperty();
-        //            ip.setName("schemaName");
-        //            ip.setType(Type.LIST);
-        //            List<String> values = new ArrayList<>();
-        //            values.add("Millennium");
-        //            ip.setPossibleValues(values);
-        //            ip.setRequired(true);
-        //            this.properties.add(ip);
-        //        }
-
     }
 
     public String getId() {
@@ -168,7 +125,6 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
         Fileformat ff = null;
         Document doc;
         try {
-            // System.out.println(this.data);
 
             doc = new SAXBuilder().build(new StringReader(this.data));
             if (doc != null && doc.hasRootElement()) {
@@ -211,7 +167,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 XSLTransformer transformer = new XSLTransformer(XSLT);
 
                 Document docMods = transformer.transform(doc);
-                logger.debug(new XMLOutputter().outputString(docMods));
+                log.debug(new XMLOutputter().outputString(docMods));
 
                 ff = new MetsMods(this.prefs);
                 DigitalDocument dd = new DigitalDocument();
@@ -234,7 +190,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 if (eleTypeOfResource != null && this.map.get("?" + eleTypeOfResource.getTextTrim()) != null) {
                     dsType = this.map.get("?" + eleTypeOfResource.getTextTrim());
                 }
-                logger.debug("Docstruct type: " + dsType);
+                log.debug("Docstruct type: " + dsType);
 
                 DocStruct dsRoot = dd.createDocStruct(this.prefs.getDocStrctTypeByName(dsType));
                 dd.setLogicalDocStruct(dsRoot);
@@ -245,10 +201,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 // Collect MODS metadata
                 WellcomeUtils.parseModsSection(MODS_MAPPING_FILE, this.prefs, dsRoot, dsBoundBook, eleMods);
                 this.currentIdentifier = WellcomeUtils.getIdentifier(this.prefs, dsRoot);
-                //                this.currentTitle = WellcomeUtils.getTitle(this.prefs, dsRoot);
-                //                this.currentAuthor = WellcomeUtils.getAuthor(this.prefs, dsRoot);
                 this.currentWellcomeIdentifier = WellcomeUtils.getWellcomeIdentifier(this.prefs, dsRoot);
-                //                this.currentWellcomeLeader6 = WellcomeUtils.getLeader6(this.prefs, dsRoot);
                 currentIADownloadIdentifier = WellcomeUtils.getAIDownloadIdentifier(prefs, dsRoot);
                 // Add dummy volume to anchors
                 if ("Periodical".equals(dsRoot.getType().getName()) || "MultiVolumeWork".equals(dsRoot.getType().getName())) {
@@ -270,9 +223,9 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                     mdForPath.setValue("./" + this.currentIdentifier);
                     dsBoundBook.addMetadata(mdForPath);
                 } catch (MetadataTypeNotAllowedException e1) {
-                    logger.error("MetadataTypeNotAllowedException while reading images", e1);
+                    log.error("MetadataTypeNotAllowedException while reading images", e1);
                 } catch (DocStructHasNoTypeException e1) {
-                    logger.error("DocStructHasNoTypeException while reading images", e1);
+                    log.error("DocStructHasNoTypeException while reading images", e1);
                 }
 
                 // Add collection names attached to the current record
@@ -288,24 +241,24 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 dateDigitization.setValue("2012");
                 Metadata placeOfElectronicOrigin = new Metadata(this.prefs.getMetadataTypeByName("_placeOfElectronicOrigin"));
                 placeOfElectronicOrigin.setValue("Wellcome Trust");
-                Metadata _electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
-                _electronicEdition.setValue("[Electronic ed.]");
-                Metadata _electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
-                _electronicPublisher.setValue("Wellcome Trust");
-                Metadata _digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-                _digitalOrigin.setValue("reformatted digital");
+                Metadata electronicEdition = new Metadata(this.prefs.getMetadataTypeByName("_electronicEdition"));
+                electronicEdition.setValue("[Electronic ed.]");
+                Metadata electronicPublisher = new Metadata(this.prefs.getMetadataTypeByName("_electronicPublisher"));
+                electronicPublisher.setValue("Wellcome Trust");
+                Metadata digitalOrigin = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+                digitalOrigin.setValue("reformatted digital");
                 if (dsRoot.getType().isAnchor()) {
                     DocStruct ds = dsRoot.getAllChildren().get(0);
                     ds.addMetadata(dateDigitization);
-                    ds.addMetadata(_electronicEdition);
+                    ds.addMetadata(electronicEdition);
 
                 } else {
                     dsRoot.addMetadata(dateDigitization);
-                    dsRoot.addMetadata(_electronicEdition);
+                    dsRoot.addMetadata(electronicEdition);
                 }
                 dsRoot.addMetadata(placeOfElectronicOrigin);
-                dsRoot.addMetadata(_electronicPublisher);
-                dsRoot.addMetadata(_digitalOrigin);
+                dsRoot.addMetadata(electronicPublisher);
+                dsRoot.addMetadata(digitalOrigin);
 
                 Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
                 physicalLocation.setValue("Wellcome Trust");
@@ -313,54 +266,31 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }
-        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException | TypeNotAllowedAsChildException e) {
-            logger.error(this.currentIdentifier + ": " + e.getMessage(), e);
+        } catch (JDOMException | IOException | PreferencesException | TypeNotAllowedForParentException | MetadataTypeNotAllowedException
+                | TypeNotAllowedAsChildException e) {
+            log.error(this.currentIdentifier + ": " + e.getMessage(), e);
             throw new ImportPluginException(e);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new ImportPluginException(e);
         }
         return ff;
     }
 
     private void generateProperties(ImportObject io) {
-        //        for (ImportProperty ip : this.properties) {
-        //            Processproperty pe = new Processproperty();
-        //            pe.setTitel(ip.getName());
-        //            pe.setContainer(ip.getContainer());
-        //            pe.setCreationDate(new Date());
-        //            pe.setIstObligatorisch(false);
-        //            if (ip.getType().equals(Type.LIST)) {
-        //                pe.setType(PropertyType.List);
-        //            } else if (ip.getType().equals(Type.TEXT)) {
-        //                pe.setType(PropertyType.String);
-        //            }
-        //            pe.setWert(ip.getValue());
-        //            io.getProcessProperties().add(pe);
-        //        }
 
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("importPlugin");
-            pe.setWert(getTitle());
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
-        {
-            Processproperty pe = new Processproperty();
-            pe.setTitel("b-number");
-            pe.setWert(this.currentIdentifier);
-            pe.setType(PropertyType.STRING);
-            io.getProcessProperties().add(pe);
-        }
+        Processproperty pe = new Processproperty();
+        pe.setTitel("importPlugin");
+        pe.setWert(getTitle());
+        pe.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe);
 
-        //		{
-        //			Prozesseigenschaft pe = new Prozesseigenschaft();
-        //			pe.setTitel("CatalogueURL");
-        //			pe.setWert("http://catalogue.example.com/db/3/?id=" + this.currentIdentifier);
-        //			pe.setType(PropertyType.String);
-        //			io.getProcessProperties().add(pe);
-        //		}
+        Processproperty pe2 = new Processproperty();
+        pe2.setTitel("b-number");
+        pe2.setWert(this.currentIdentifier);
+        pe2.setType(PropertyType.STRING);
+        io.getProcessProperties().add(pe2);
+
     }
 
     @Override
@@ -390,25 +320,21 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                     MetsMods mm = new MetsMods(this.prefs);
                     mm.setDigitalDocument(ff.getDigitalDocument());
                     String fileName = getImportFolder() + getProcessTitle() + ".xml";
-                    logger.debug("Writing '" + fileName + "' into given folder...");
+                    log.debug("Writing '" + fileName + "' into given folder...");
                     mm.write(fileName);
                     io.setMetsFilename(fileName);
                     io.setImportReturnValue(ImportReturnValue.ExportFinished);
-                    // ret.put(getProcessTitle(), ImportReturnValue.ExportFinished);
                 } catch (PreferencesException e) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     io.setErrorMessage(e.getMessage());
                     io.setImportReturnValue(ImportReturnValue.InvalidData);
-                    // ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
                 } catch (WriteException e) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     io.setImportReturnValue(ImportReturnValue.WriteError);
                     io.setErrorMessage(e.getMessage());
-                    // ret.put(getProcessTitle(), ImportReturnValue.WriteError);
                 }
             } else {
                 io.setImportReturnValue(ImportReturnValue.InvalidData);
-                // ret.put(getProcessTitle(), ImportReturnValue.InvalidData);
             }
             answer.add(io);
         }
@@ -419,20 +345,18 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
     @Override
     public List<Record> generateRecordsFromFile() {
         List<Record> ret = new ArrayList<>();
-        // InputStream input = null;
         try {
             Document doc = new SAXBuilder().build(this.importFile);
             if (doc != null && doc.getRootElement() != null) {
                 Record record = new Record();
                 record.setData(new XMLOutputter().outputString(doc));
-                // record.setData(new XMLOutputter().outputString(doc).replace("marc:", ""));
                 ret.add(record);
 
             } else {
-                logger.error("Could not parse '" + this.importFile + "'.");
+                log.error("Could not parse '" + this.importFile + "'.");
             }
         } catch (JDOMException | IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return ret;
     }
@@ -463,21 +387,20 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                 recordStrings.add(sb.toString());
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         // Convert strings to MARCXML records and add them to Record objects
         for (String s : recordStrings) {
-            String data;
             try {
-                data = convertTextToMarcXml(s);
+                String data = convertTextToMarcXml(s);
                 if (data != null) {
                     Record rec = new Record();
                     rec.setData(data);
                     ret.add(rec);
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
 
@@ -491,9 +414,7 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
     @Override
     public String getProcessTitle() {
-        // if (StringUtils.isNotBlank(this.currentTitle)) {
-        // return new ImportOpac().createAtstsl(this.currentTitle, this.currentAuthor).toLowerCase() + "_" + this.currentIdentifier ;
-        // }
+
         String returnvalue = "";
         if (currentIADownloadIdentifier != null) {
             returnvalue = currentIADownloadIdentifier.replaceAll("\\W", "_") + "_";
@@ -639,10 +560,10 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
                     record.setData(new XMLOutputter().outputString(doc));
                     records.add(record);
                 } else {
-                    logger.error("Could not parse '" + filename + "'.");
+                    log.error("Could not parse '" + filename + "'.");
                 }
             } catch (JDOMException | IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
 
         }
@@ -660,37 +581,37 @@ public class WellcomeMillenniumImport implements IImportPlugin, IPlugin {
 
     @Override
     public String addDocstruct() {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
         return "";
     }
 
     @Override
     public String deleteDocstruct() {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
         return "";
     }
 
     @Override
     public List<DocstructElement> getCurrentDocStructs() {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
         return null;
     }
 
     @Override
     public List<String> getPossibleDocstructs() {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
         return null;
     }
 
     @Override
     public DocstructElement getDocstruct() {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
         return null;
     }
 
     @Override
     public void setDocstruct(DocstructElement dse) {
-        // TODO Auto-generated method stub
+        //  Auto-generated method stub
 
     }
 
