@@ -53,6 +53,8 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 
+import javax.faces.model.SelectItem;
+
 @Log4j2
 @PluginImplementation
 public class MultipleManifestationMillenniumImport implements IImportPlugin, IPlugin {
@@ -103,7 +105,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         List<String> values = new ArrayList<>();
         values.add("Digitised");
         values.add("Born digital");
-        ip.setPossibleValues(values);
+        ip.setPossibleValues(values.stream()
+                .map(v -> new SelectItem(v, v))
+                .toList());
         ip.setRequired(true);
         this.properties.add(ip);
 
@@ -119,7 +123,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         values = new ArrayList<>();
         values.add("open");
         values.add("closed");
-        ip3.setPossibleValues(values);
+        ip3.setPossibleValues(values.stream()
+                .map(v -> new SelectItem(v, v))
+                .toList());
         ip3.setRequired(true);
         this.properties.add(ip3);
 
@@ -128,7 +134,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         ip4.setType(Type.LIST);
         values = new ArrayList<>();
         values.add("Millennium");
-        ip4.setPossibleValues(values);
+        ip4.setPossibleValues(values.stream()
+                .map(v -> new SelectItem(v, v))
+                .toList());
         ip4.setRequired(true);
         this.properties.add(ip4);
 
@@ -141,7 +149,9 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         values.add("Video & transcript");
         values.add("Audio & transcript");
         values.add("Audio & transcript & poster image");
-        ip5.setPossibleValues(values);
+        ip5.setPossibleValues(values.stream()
+                .map(v -> new SelectItem(v, v))
+                .toList());
         ip5.setRequired(true);
         this.properties.add(ip5);
 

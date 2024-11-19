@@ -45,6 +45,8 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 
+import javax.faces.model.SelectItem;
+
 //@PluginImplementation
 public class WellcomeImagesImport implements IImportPlugin, IPlugin {
 
@@ -77,7 +79,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
             List<String> values = new ArrayList<>();
             values.add("Digitised");
             values.add("Born digital");
-            ip.setPossibleValues(values);
+            ip.setPossibleValues(values.stream()
+                    .map(v -> new SelectItem(v, v))
+                    .toList());
             ip.setRequired(true);
             this.properties.add(ip);
         }
@@ -95,7 +99,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
             List<String> values = new ArrayList<>();
             values.add("open");
             values.add("closed");
-            ip.setPossibleValues(values);
+            ip.setPossibleValues(values.stream()
+                    .map(v -> new SelectItem(v, v))
+                    .toList());
             ip.setRequired(true);
             this.properties.add(ip);
         }
@@ -105,7 +111,9 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
             ip.setType(Type.LIST);
             List<String> values = new ArrayList<>();
             values.add("MIRO");
-            ip.setPossibleValues(values);
+            ip.setPossibleValues(values.stream()
+                    .map(v -> new SelectItem(v, v))
+                    .toList());
             ip.setRequired(true);
             this.properties.add(ip);
         }
