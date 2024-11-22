@@ -7,6 +7,8 @@ import org.goobi.production.importer.DocstructElement;
 import org.goobi.production.properties.ImportProperty;
 import org.goobi.production.properties.Type;
 
+import javax.faces.model.SelectItem;
+
 public class WellcomeDocstructElement extends DocstructElement {
 
 	private ImportProperty copyProperty = new ImportProperty();
@@ -29,7 +31,9 @@ public class WellcomeDocstructElement extends DocstructElement {
 		for (int i = 1; i <= 99; i++) {
 			values.add(String.valueOf(i));
 		}
-		volumeProperty.setPossibleValues(values);
+		volumeProperty.setPossibleValues(values.stream()
+				.map(v -> new SelectItem(v, v))
+				.toList());
 		volumeProperty.setValue("N/A");
 		
 		
@@ -40,7 +44,9 @@ public class WellcomeDocstructElement extends DocstructElement {
 		for (int i = 1; i <= 99; i++) {
 			possibleValues.add(String.valueOf(i));
 		}
-		copyProperty.setPossibleValues(possibleValues);
+		copyProperty.setPossibleValues(possibleValues.stream()
+				.map(v -> new SelectItem(v, v))
+				.toList());
 		copyProperty.setValue("N/A");
 	}
 
