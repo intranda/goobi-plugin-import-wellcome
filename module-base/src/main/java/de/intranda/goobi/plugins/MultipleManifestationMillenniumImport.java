@@ -53,7 +53,7 @@ import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
 
-import javax.faces.model.SelectItem;
+import jakarta.faces.model.SelectItem;
 
 @Log4j2
 @PluginImplementation
