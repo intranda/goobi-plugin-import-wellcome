@@ -7,7 +7,7 @@ import org.goobi.production.importer.DocstructElement;
 import org.goobi.production.properties.ImportProperty;
 import org.goobi.production.properties.Type;
 
-import javax.faces.model.SelectItem;
+import jakarta.faces.model.SelectItem;
 
 public class WellcomeDocstructElement extends DocstructElement {
 
