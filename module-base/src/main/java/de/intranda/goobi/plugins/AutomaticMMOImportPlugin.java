@@ -297,7 +297,6 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
                 pe.setTitel(ip.getName());
                 pe.setContainer(ip.getContainer());
                 pe.setCreationDate(new Date());
-                pe.setIstObligatorisch(false);
                 if (Type.LIST.equals(ip.getType())) {
                     pe.setType(PropertyType.LIST);
                 } else if (Type.TEXT.equals(ip.getType())) {

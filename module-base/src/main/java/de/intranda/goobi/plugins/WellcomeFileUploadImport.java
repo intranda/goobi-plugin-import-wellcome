@@ -263,9 +263,9 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
                 dsRoot.addMetadata(electronicPublisher);
                 dsRoot.addMetadata(digitalOrigin);
 
-                Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
-                physicalLocation.setValue("Wellcome Trust");
-                dsBoundBook.addMetadata(physicalLocation);
+                //                Metadata physicalLocation = new Metadata(this.prefs.getMetadataTypeByName("_digitalOrigin"));
+                //                physicalLocation.setValue("Wellcome Trust");
+                //                dsBoundBook.addMetadata(physicalLocation);
                 File folderForImport = new File(getImportFolder() + File.separator + getProcessTitle() + File.separator + "import" + File.separator);
                 WellcomeUtils.writeXmlToFile(folderForImport.getAbsolutePath(), getProcessTitle() + "_mrc.xml", doc);
             }

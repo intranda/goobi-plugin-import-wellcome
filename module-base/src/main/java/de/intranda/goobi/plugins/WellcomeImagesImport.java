@@ -32,6 +32,7 @@ import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
+import jakarta.faces.model.SelectItem;
 import ugh.dl.DigitalDocument;
 import ugh.dl.DocStruct;
 import ugh.dl.DocStructType;
@@ -44,8 +45,6 @@ import ugh.exceptions.PreferencesException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-
-import jakarta.faces.model.SelectItem;
 
 //@PluginImplementation
 public class WellcomeImagesImport implements IImportPlugin, IPlugin {
@@ -292,7 +291,6 @@ public class WellcomeImagesImport implements IImportPlugin, IPlugin {
             pe.setTitel(ip.getName());
             pe.setContainer(ip.getContainer());
             pe.setCreationDate(new Date());
-            pe.setIstObligatorisch(false);
             if (Type.LIST.equals(ip.getType())) {
                 pe.setType(PropertyType.LIST);
             } else if (Type.TEXT.equals(ip.getType())) {
