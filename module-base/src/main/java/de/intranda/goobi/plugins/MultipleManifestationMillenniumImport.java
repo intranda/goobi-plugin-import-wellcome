@@ -37,6 +37,7 @@ import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
+import jakarta.faces.model.SelectItem;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
@@ -52,8 +53,6 @@ import ugh.exceptions.TypeNotAllowedAsChildException;
 import ugh.exceptions.TypeNotAllowedForParentException;
 import ugh.exceptions.WriteException;
 import ugh.fileformats.mets.MetsMods;
-
-import jakarta.faces.model.SelectItem;
 
 @Log4j2
 @PluginImplementation
@@ -352,7 +351,6 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
                 pe.setTitel(ip.getName());
                 pe.setContainer(ip.getContainer());
                 pe.setCreationDate(new Date());
-                pe.setIstObligatorisch(false);
                 if (Type.LIST.equals(ip.getType())) {
                     pe.setType(PropertyType.LIST);
                 } else if (Type.TEXT.equals(ip.getType())) {
