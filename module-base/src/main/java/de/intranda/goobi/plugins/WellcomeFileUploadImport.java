@@ -394,10 +394,14 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     private void extractZipFile(Path tempFolder) throws IOException {
         byte[] buffer = new byte[1024];
+        Path targetBase = tempFolder.normalize();
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                Path extractedFile = Paths.get(tempFolder.toString(), zipEntry.getName());
+                Path extractedFile = targetBase.resolve(zipEntry.getName()).normalize();
+                if (!extractedFile.startsWith(targetBase)) {
+                    throw new IOException("Zip Slip detected, rejecting entry: " + zipEntry.getName());
+                }
                 try (OutputStream os = Files.newOutputStream(extractedFile)) {
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
