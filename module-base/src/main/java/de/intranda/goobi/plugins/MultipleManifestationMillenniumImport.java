@@ -27,7 +27,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
@@ -35,6 +34,7 @@ import de.intranda.goobi.plugins.utils.WellcomeDocstructElement;
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.XmlTools;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 import jakarta.faces.model.SelectItem;
@@ -172,7 +172,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
         Document doc;
         try {
 
-            doc = new SAXBuilder().build(new StringReader(this.data));
+            doc = XmlTools.getSAXBuilder().build(new StringReader(this.data));
             if (doc != null && doc.hasRootElement()) {
                 Element root = doc.getRootElement();
                 Element rec = null;
@@ -436,7 +436,7 @@ public class MultipleManifestationMillenniumImport implements IImportPlugin, IPl
     public List<Record> generateRecordsFromFile() {
         List<Record> ret = new ArrayList<>();
         try {
-            Document doc = new SAXBuilder().build(this.importFile);
+            Document doc = XmlTools.getSAXBuilder().build(this.importFile);
             if (doc != null && doc.getRootElement() != null) {
                 Record rec = new Record();
                 rec.setData(new XMLOutputter().outputString(doc));

@@ -8,7 +8,6 @@ import java.io.StringReader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
@@ -40,6 +38,7 @@ import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
 import de.sub.goobi.helper.StorageProvider;
+import de.sub.goobi.helper.XmlTools;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 import lombok.Getter;
@@ -129,7 +128,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
         Document doc;
         try {
 
-            doc = new SAXBuilder().build(new StringReader(data.getData()));
+            doc = XmlTools.getSAXBuilder().build(new StringReader(data.getData()));
             if (doc != null && doc.hasRootElement()) {
                 Element rec = null;
                 Element root = doc.getRootElement();
@@ -416,7 +415,7 @@ public class WellcomeFileUploadImport implements IImportPluginVersion2, IPlugin 
 
     private Record readFile(File file) {
         try {
-            Document doc = new SAXBuilder().build(file);
+            Document doc = XmlTools.getSAXBuilder().build(file);
             if (doc != null && doc.getRootElement() != null) {
                 Record rec = new Record();
                 rec.setId(file.getName());

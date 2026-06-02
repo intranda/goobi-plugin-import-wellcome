@@ -25,12 +25,12 @@ import org.goobi.production.properties.Type;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
 import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.XmlTools;
 import de.sub.goobi.helper.enums.PropertyType;
 import jakarta.faces.model.SelectItem;
 import ugh.dl.DigitalDocument;
@@ -157,12 +157,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         Fileformat ff = null;
         Document doc;
         try {
-            SAXBuilder sb = new SAXBuilder(false);
-            sb.setValidation(false);
-            sb.setFeature("http://xml.org/sax/features/validation", false);
-            sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-            sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            doc = sb.build(new StringReader(this.data));
+
+            doc = XmlTools.getSAXBuilder().build(new StringReader(this.data));
 
             if (doc != null && doc.hasRootElement()) {
                 ff = new MetsMods(this.prefs);
@@ -394,17 +390,12 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
 
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public List<Record> generateRecordsFromFile() {
         List<Record> ret = new ArrayList<>();
         try {
-            SAXBuilder sb = new SAXBuilder(false);
-            sb.setValidation(false);
-            sb.setFeature("http://xml.org/sax/features/validation", false);
-            sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-            sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            Document doc = sb.build(this.importFile);
+
+            Document doc = XmlTools.getSAXBuilder().build(this.importFile);
             if (doc != null && doc.getRootElement() != null) {
                 Record record = new Record();
                 record.setData(new XMLOutputter().outputString(doc));
@@ -515,12 +506,8 @@ public class WellcomeCalmImport implements IImportPlugin, IPlugin {
         for (String filename : filenames) {
             File f = new File(folder, filename);
             try {
-                SAXBuilder sb = new SAXBuilder(false);
-                sb.setValidation(false);
-                sb.setFeature("http://xml.org/sax/features/validation", false);
-                sb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-                sb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-                Document doc = sb.build(f);
+
+                Document doc = XmlTools.getSAXBuilder().build(f);
                 if (doc != null && doc.getRootElement() != null) {
                     Record record = new Record();
                     record.setData(new XMLOutputter().outputString(doc));

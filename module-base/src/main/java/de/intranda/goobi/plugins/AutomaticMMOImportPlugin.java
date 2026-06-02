@@ -26,7 +26,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.XSLTransformer;
 
@@ -35,6 +34,7 @@ import de.intranda.goobi.plugins.utils.WellcomeUtils;
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.forms.MassImportForm;
+import de.sub.goobi.helper.XmlTools;
 import de.sub.goobi.helper.enums.PropertyType;
 import de.sub.goobi.helper.exceptions.ImportPluginException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -111,7 +111,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
             String filename = currentRecord.getId().replace(".xml", "").replace("_marc", "");
             String anchorIdentifier = filename.substring(0, filename.indexOf("_"));
             String order = filename.substring(filename.indexOf("_") + 1);
-            doc = new SAXBuilder().build(new StringReader(this.currentRecord.getData()));
+            doc = XmlTools.getSAXBuilder().build(new StringReader(this.currentRecord.getData()));
             if (doc != null && doc.hasRootElement()) {
                 Element root = doc.getRootElement();
                 Element record = null;
@@ -491,7 +491,7 @@ public class AutomaticMMOImportPlugin implements IImportPlugin, IPlugin {
         for (String filename : filenames) {
             File f = new File(folder, filename);
             try {
-                Document doc = new SAXBuilder().build(f);
+                Document doc = XmlTools.getSAXBuilder().build(f);
                 if (doc != null && doc.getRootElement() != null) {
                     Record record = new Record();
                     record.setId(filename);
